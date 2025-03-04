@@ -1,17 +1,17 @@
-import { Link } from 'expo-router'
-import React from 'react'
-import { StatusBar, Text } from 'react-native'
-import { View } from 'react-native'
+import { Link } from 'expo-router';
+import React from 'react';
+import ThemedView from '@/components/ThemedView';
+import ThemedText from '@/components/ThemedText';
 
 export default function Page() {
-  return (
-    <View>
-        <Link href="./" relativeToDirectory>
-          Go to Home
-        </Link>
-        <Link href="./settings" relativeToDirectory>
-          Go to Settings
-        </Link>
-    </View>
-  )
+    return (
+        <ThemedView
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+            <ThemedText style={{ fontSize: 24 }}>
+                This is the tabs index page.
+            </ThemedText>
+            <Link href="#">Go to the first tab</Link>
+        </ThemedView>
+    );
 }
