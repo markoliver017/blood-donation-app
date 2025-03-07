@@ -13,7 +13,20 @@ module.exports = function (api) {
                     alias: {
                         '@': './',
                         '@app': './app',
+                        '@api': './api',
                     },
+                },
+            ],
+            [
+                'module:react-native-dotenv',
+                {
+                    moduleName: '@env',
+                    path: '.env',
+                    blocklist: null,
+                    allowlist: null,
+                    safe: false,
+                    allowUndefined: true,
+                    verbose: false,
                 },
             ],
         ],

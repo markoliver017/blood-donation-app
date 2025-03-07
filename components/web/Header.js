@@ -3,7 +3,8 @@ import { CircleUserIcon, Menu } from 'lucide-react';
 
 export default function Header({ toggleSidebar }) {
     return (
-        <nav className="flex items-center bg-gray-200 dark:bg-gray-700 h-20 font-semibold dark:text-slate-200 shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px]">
+        // <nav className="flex items-center bg-gray-200 dark:bg-gray-700 h-20 font-semibold dark:text-slate-200 shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px]">
+        <nav className="flex items-center bg-white dark:bg-[#1C1B22] dark:text-white h-20 font-semibold shadow-[rgba(0,0,15,0.5)_10px_5px_4px_0px]">
             <div className="flex-1 px-2">
                 <div className="flex justify-between items-center h-16 ">
                     <div className="flex-1 flex gap-2">

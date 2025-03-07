@@ -30,19 +30,19 @@ export default function Sidebar({
 
     return (
         <motion.aside
-            initial={{ width: '250px' }}
-            animate={{ width: isCollapsed ? '70px' : '250px' }}
+            initial={{ width: '270px' }}
+            animate={{ width: isCollapsed ? '70px' : '270px' }}
         >
             <LinearGradient
                 colors={
                     themeMode === 'dark'
-                        ? ['#081270', '#360557']
-                        : ['#1E3A8A', '#2563EB', '#081270']
+                        ? ['#222', '#0B0638', '#000']
+                        : ['#f2f9f9', '#fff', '#f2f9f9']
                 } // Deep blue to bright blue gradient
                 start={[0, 0]}
                 end={[0, 1]}
                 className={clsx(
-                    'flex flex-col justify-between text-slate-300 dark:text-white h-screen',
+                    'flex flex-col justify-between text-slate-900 dark:text-white h-screen',
                     isCollapsed ? 'p-1' : 'p-4',
                 )}
             >
@@ -50,7 +50,7 @@ export default function Sidebar({
                     <div className="flex justify-between items-center rounded mt-2">
                         <h2
                             className={clsx(
-                                'w-full text-2xl font-bold flex gap-3 p-2 items-center cursor-pointer hover:bg-gray-700 rounded',
+                                'w-full text-2xl font-bold flex gap-3 p-2 items-center cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 rounded',
                                 isCollapsed ? 'justify-center' : '',
                             )}
                         >
@@ -65,14 +65,14 @@ export default function Sidebar({
                     </div>
 
                     {/* User Profile */}
-                    <div className="flex items-center mt-4 hover:bg-gray-300 hover:text-blue-900 dark:hover:bg-slate-700 p-2 rounded cursor-pointer">
+                    <div className="flex items-center mt-4 hover:bg-gray-300 hover:text-blue-900 dark:hover:text-blue-200 dark:hover:bg-slate-700 p-2 rounded cursor-pointer">
                         <img src={user.avatar} className="w-10 m-auto" />
                         {!isCollapsed && (
                             <div className="ml-2">
-                                <h5 className="text-lg font-bold">
+                                <h5 className="text-lg font-bold ">
                                     {user.name}
                                 </h5>
-                                <p className="text-blue-600 dark:text-blue-200">
+                                <p className="text-blue-600 dark:text-slate-200">
                                     {user.email}
                                 </p>
                             </div>
@@ -111,7 +111,7 @@ export default function Sidebar({
                                 <div
                                     className={clsx(
                                         'flex items-center gap-5 p-2 rounded text-xl shadow-sm cursor-pointer',
-                                        'text-slate-100 dark:text-white hover:bg-gray-200 hover:text-blue-700 dark:hover:text-blue-100 dark:hover:bg-gray-700',
+                                        'text-slate-900 dark:text-white hover:bg-gray-200 hover:text-blue-700 dark:hover:text-blue-100 dark:hover:bg-gray-700',
                                         isCollapsed
                                             ? 'justify-center'
                                             : 'justify-between',
