@@ -45,7 +45,7 @@ const rejectStyle = {
     borderColor: '#ff1744',
 };
 
-export default function FileUploadComponent({
+export default function PhotoUploadComponent({
     files,
     setFiles,
 

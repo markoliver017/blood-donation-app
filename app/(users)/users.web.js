@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { DataTable } from '@/components/web/users/DataTable';
-import { Checkbox } from '@/components/web/ui/checkbox';
-import DataTableColumnHeader from '@/components/web/reusable_components/DataTableColumnHeader';
+import { DataTable } from '@components/web/users/DataTable';
+import { Checkbox } from '@components/web/ui/checkbox';
+import DataTableColumnHeader from '@components/web/reusable_components/DataTableColumnHeader';
 
 import { getAllUsers } from '@/api/users';
 import SweetAlert from '@/components/web/helper/SweetAlert';

@@ -2,11 +2,23 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@/*": ["./*"],
-            "@app/*": ["./app/*"],
-            "@api/*": ["./api/*"],
-            "@components/*": ["./components/*"]
+            "@/*": [
+                "./*"
+            ],
+            "@app/*": [
+                "./app/*"
+            ],
+            "@api/*": [
+                "./api/*"
+            ],
+            "@components/*": [
+                "./components/*"
+            ]
         }
     },
-    "include": ["app/**/*", "api/**/*", "**/*"]
+    "include": [
+        "app/**/*",
+        "api/**/*",
+        "**/*"
+    ]
 }

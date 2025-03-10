@@ -280,37 +280,40 @@ export const getSingleStyle = (mode) => {
                 border: '1px solid gray',
             };
         },
-        option: (provided, { data, isFocused }) => {
+        option: (provided, { data, isFocused, isSelected }) => {
             return {
                 ...provided,
                 borderRadius: '10px',
-                padding: '10px',
-                margin: '5px 0',
                 color:
                     mode === 'light'
                         ? isFocused
-                            ? '#fff'
+                            ? '#000'
                             : 'black'
                         : isFocused
-                        ? 'black'
-                        : '#fff',
+                            ? '#fff'
+                            : '#fff',
                 backgroundColor:
                     mode === 'light'
                         ? isFocused
-                            ? '#5e5d58'
+                            ? '#D0EFFF' // Light blue for focused option
                             : '#fff'
                         : isFocused
-                        ? '#fff'
-                        : '#5e5d58',
+                            ? '#3A3A3A' // Dark gray for focused option
+                            : '#2C2C2C',
                 ':hover': {
-                    color: mode === 'light' ? 'darkblue' : 'lightblue',
-                    padding: '15px',
-                    backgroundColor:
-                        mode === 'light' ? 'lightblue' : 'darkblue',
+                    backgroundColor: mode === 'light' ? '#E0E0E0' : '#1E1E1E', // Light gray for light mode, dark gray for dark mode
                 },
                 ':hover div': {
                     backgroundColor: 'inherit', // Ensure the label background color matches the option background color on hover
                 },
+                ...(isSelected && {
+                    backgroundColor: mode === 'light' ? '#C8E6C9' : '#388E3C', // Light green for light mode, dark green for dark mode
+                    color: mode === 'light' ? '#000' : '#fff', // Dark text for light mode, light text for dark mode
+                }),
+                ...(isFocused && {
+                    backgroundColor: mode === 'light' ? '#D0EFFF' : '#3A3A3A', // Light blue for light mode, dark gray for dark mode
+                    color: mode === 'light' ? '#000' : '#fff', // Dark text for light mode, light text for dark mode
+                }),
             };
         },
         input: (provided) => ({

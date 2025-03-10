@@ -1,6 +1,6 @@
-import Sidebar from '@/components/web/layout/Sidebar';
-import Header from '@/components/web/layout/Header';
-import Preloader from '@/components/web/layout/Preloader';
+import Sidebar from '@components/web/layout/Sidebar';
+import Header from '@components/web/layout/Header';
+import Preloader from '@components/web/layout/Preloader';
 import { Slot } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
@@ -44,11 +44,11 @@ export default function RootLayout() {
             {/* Main Content Area */}
             <div
                 className="flex-1 flex flex-col"
-                // style={{
-                //     backgroundImage: 'url(/images/pcmc_bg.jpg)',
-                //     backgroundSize: 'cover',
-                //     backgroundPosition: 'center',
-                // }}
+            // style={{
+            //     backgroundImage: 'url(/images/pcmc_bg.jpg)',
+            //     backgroundSize: 'cover',
+            //     backgroundPosition: 'center',
+            // }}
             >
                 <ToastContainer />
                 <Header toggleSidebar={handleToggleSidebar} />
