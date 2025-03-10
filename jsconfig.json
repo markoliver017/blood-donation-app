@@ -4,7 +4,8 @@
         "paths": {
             "@/*": ["./*"],
             "@app/*": ["./app/*"],
-            "@api/*": ["./api/*"]
+            "@api/*": ["./api/*"],
+            "@components/*": ["./components/*"]
         }
     },
     "include": ["app/**/*", "api/**/*", "**/*"]
