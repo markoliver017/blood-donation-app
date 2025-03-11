@@ -15,8 +15,8 @@ import { UserPlus } from 'lucide-react';
 import { IconPickerItem } from 'react-icons-picker';
 import Select from 'react-select';
 import { useColorScheme } from 'react-native';
-import { storeUser1 } from '@api/users/query';
-import { getAllRoles } from '@api/roles/query';
+import { storeUser } from '@/api/users/usersQuery';
+import { getAllRoles } from '@/api/roles/rolesQuery';
 import { toast } from 'react-toastify';
 
 /* reducer function */
@@ -110,26 +110,28 @@ const Create = () => {
 
     const saveUser = async (data) => {
         try {
-            const response = await storeUser1(data);
+            const response = await storeUser(data);
             alert('successs');
-            console.log('resssssssssssssponse', response);
+            console.log("responseeeeeeeeeeeeeee", response);
+            if (!response.error) {
+
+                toast.success(response.msg, {
+                    position: "top-right",
+                    autoClose: 5000,
+                })
+            }
+
         } catch (error) {
-            const errorData = error.response?.data?.validation_errors || {};
+            alert('error');
+            const errorData = error.response?.data?.errors || {};
             Object.keys(errorData).forEach((key) => {
                 toast.error(errorData[key], {
-                    position: 'top-right',
+                    position: 'bottom-right',
                     autoClose: 5000,
                 });
             });
-            console.error(error);
+            // console.error(error);
 
-            // SweetAlert({
-            //     title: 'Error',
-            //     text: 'Error fetching users: ' + error.response.data.message,
-            //     icon: 'error',
-            //     showCancelButton: false,
-            //     confirmButtonText: 'OK',
-            // });
         } finally {
             setProcessing(false);
         }
