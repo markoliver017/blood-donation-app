@@ -48,7 +48,6 @@ const rejectStyle = {
 export default function PhotoUploadComponent({
     files,
     setFiles,
-
     photo = null,
 }) {
     const mode = useColorScheme();

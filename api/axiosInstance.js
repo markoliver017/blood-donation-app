@@ -1,6 +1,5 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { generateToken, validateToken } from '@api/auth';
+
 // import { API_TOKEN } from '@env';
 const API_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0dXNlckBlbWFpbC5jb20iLCJpYXQiOjE3NDEzMTkzNDV9.v4MpFMXNq7L7USZm8ZGrxKLEEDXbVV_uSf-ldkJRmUM';

@@ -3,7 +3,7 @@ import { DataTable } from '@components/web/users/DataTable';
 import { Checkbox } from '@components/web/ui/checkbox';
 import DataTableColumnHeader from '@components/web/reusable_components/DataTableColumnHeader';
 
-import { getAllUsers } from '@/api/users';
+import { getAllUsers } from '@/api/users/query';
 import SweetAlert from '@/components/web/helper/SweetAlert';
 import { toast } from 'react-toastify';
 

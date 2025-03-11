@@ -1,12 +1,23 @@
 import React, { useEffect, useReducer, useState, forwardRef } from 'react';
+import {
+    Alert,
+    StyleSheet,
+    Text,
+    Pressable,
+    View,
+    ActivityIndicator,
+} from 'react-native';
+import Modal from 'react-native-modal';
 import PhotoUploadComponent from '@components/web/reusable_components/PhotoUploadComponent';
-import { Button, Label, Modal } from 'flowbite-react';
+import { Label } from 'flowbite-react';
 import { getSingleStyle } from '@components/web/custom/select-styles';
 import { UserPlus } from 'lucide-react';
-import { MdBoy, MdGirl } from "react-icons/md";
+import { IconPickerItem } from 'react-icons-picker';
 import Select from 'react-select';
-import moment from 'moment';
 import { useColorScheme } from 'react-native';
+import { storeUser1 } from '@api/users/query';
+import { getAllRoles } from '@api/roles/query';
+import { toast } from 'react-toastify';
 
 /* reducer function */
 const updateSelectOptions = (state, action) => {
@@ -14,16 +25,16 @@ const updateSelectOptions = (state, action) => {
 
     if (type === 'reset') {
         return {
-            gender: null,
-            role: null,
-            blood_type: null,
+            role_id: null,
         };
     }
 
     return { ...state, [type]: selected };
 };
 
-export default function Create() {
+const Create = () => {
+    const [roleOptions, setRoleOptions] = useState([]);
+
     const mode = useColorScheme();
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
@@ -32,18 +43,27 @@ export default function Create() {
         {},
     );
 
-    const [open, setOpen] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
 
     const [files, setFiles] = useState([]);
     const [data, setData] = useState({
         user_photo: '',
         first_name: '',
+        last_name: '',
+        middle_name: '',
+        gender: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+        // photo: '',
+        file: '',
+        role_id: '',
     });
 
     useEffect(() => {
         setData((prev) => ({
             ...prev,
-            ['user_photo']: files[0],
+            ['file']: files[0],
         }));
     }, [files]);
 
@@ -51,10 +71,28 @@ export default function Create() {
         console.log('dataaaaaaaaaaaaaaaaaaaa', data);
     }, [data]);
 
+    useEffect(() => {
+        (async () => {
+            try {
+                const rolesData = await getAllRoles();
+                setRoleOptions(
+                    rolesData.map((role) => ({
+                        label: role.role_name,
+                        value: role.role_name,
+                        icon: role.icon,
+                        id: role.id,
+                    })),
+                );
+            } catch (error) {
+                console.error('Error fetching rolessss:', error);
+            }
+        })();
+    }, []);
+
     const handleSelectedOptions = (type, selected) => {
         setData((prev) => ({
             ...prev,
-            [type]: selected?.value,
+            [type]: selected?.id || selected?.value,
         }));
         dispatchSelectedState({
             type: type,
@@ -70,35 +108,74 @@ export default function Create() {
         }));
     };
 
+    const saveUser = async (data) => {
+        try {
+            const response = await storeUser1(data);
+            alert('successs');
+            console.log('resssssssssssssponse', response);
+        } catch (error) {
+            const errorData = error.response?.data?.validation_errors || {};
+            Object.keys(errorData).forEach((key) => {
+                toast.error(errorData[key], {
+                    position: 'top-right',
+                    autoClose: 5000,
+                });
+            });
+            console.error(error);
+
+            // SweetAlert({
+            //     title: 'Error',
+            //     text: 'Error fetching users: ' + error.response.data.message,
+            //     icon: 'error',
+            //     showCancelButton: false,
+            //     confirmButtonText: 'OK',
+            // });
+        } finally {
+            setProcessing(false);
+        }
+    };
+
     const handleSubmit = (e) => {
+        alert('submit');
+        setProcessing(true);
         e.preventDefault();
-        dispatchSelectedState({ type: 'reset' });
+        saveUser(data);
     };
 
     return (
         <>
-            <Modal size='sm' position='bottom-center' popup show={open} onClose={() => setOpen(false)}>
-                <Modal.Header>Terms of Service</Modal.Header>
-                <Modal.Body>
-                    <div className="space-y-6">
-                        <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                            With less than a month to go before the European Union enacts new consumer privacy laws for its citizens,
-                            companies around the world are updating their terms of service agreements to comply.
-                        </p>
-                        <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                            The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on May 25 and is meant
-                            to ensure a common set of data rights in the European Union. It requires organizations to notify users as
-                            soon as possible of high-risk data breaches that could personally affect them.
-                        </p>
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={() => setOpen(false)}>I accept</Button>
-                    <Button color="gray" onClick={() => setOpen(false)}>
-                        Decline
-                    </Button>
-                </Modal.Footer>
+            <Modal
+                isVisible={modalVisible}
+                onBackdropPress={() => setModalVisible(false)}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Hello World!</Text>
+                        <Pressable
+                            style={[styles.button, styles.buttonClose]}
+                            onPress={() => setModalVisible(!modalVisible)}
+                        >
+                            <Text style={styles.textStyle}>Hide Modal</Text>
+                        </Pressable>
+                    </View>
+                </View>
             </Modal>
+            {/* <Modal
+                animationType="slide"
+                transparent={true}
+                backdropColor={'gray'}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                    setModalVisible(!modalVisible);
+                }}
+            ></Modal> */}
+            <Pressable
+                style={[styles.button, styles.buttonOpen]}
+                onPress={() => setModalVisible(true)}
+            >
+                <Text style={styles.textStyle}>Show Modal</Text>
+            </Pressable>
             <div className="flex justify-center items-center ">
                 <div className="w-full max-w-6xl border shadow-md rounded p-5 bg-gray-200 dark:bg-slate-700">
                     <div className="flex flex-wrap">
@@ -115,16 +192,17 @@ export default function Create() {
                         </div>
 
                         <div className="flex-1 w-full space-y-3 p-5">
-                            <form onSubmit={handleSubmit} className="space-y-3">
+                            <form className="space-y-3">
                                 <span className="divider divider-start text-lg underline pb-5">
                                     Employee Information
-                                    <Button onClick={() => setOpen(true)}>Toggle modal</Button>
                                 </span>
                                 <div>
                                     <div>
                                         <Label>
                                             First Name:{' '}
-                                            <span className="text-red-500">*</span>
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </Label>
                                         <input
                                             type="text"
@@ -143,7 +221,9 @@ export default function Create() {
                                     <div>
                                         <Label>
                                             Last Name:{' '}
-                                            <span className="text-red-500">*</span>
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </Label>
                                         <input
                                             type="text"
@@ -158,6 +238,7 @@ export default function Create() {
                                             )}
                                         </div>
                                     </div>
+
                                     <div>
                                         <Label>Middle Name: </Label>
                                         <input
@@ -169,7 +250,9 @@ export default function Create() {
                                         />
                                         <div className="error">
                                             {errors.middle_name && (
-                                                <span>{errors.middle_name}</span>
+                                                <span>
+                                                    {errors.middle_name}
+                                                </span>
                                             )}
                                         </div>
                                     </div>
@@ -177,7 +260,7 @@ export default function Create() {
                                         <Label>
                                             Title:{' '}
                                             <small className="italic text-gray-600">
-                                                (optional) Comm'r, Atty., Dr., Prof.
+                                                (optional) Atty., Dr., Prof.
                                             </small>
                                         </Label>
                                         <input
@@ -215,7 +298,12 @@ export default function Create() {
                                     </div>
 
                                     <div>
-                                        <Label>Contact #:</Label>
+                                        <Label>
+                                            Contact #:
+                                            <small className="italic text-gray-600">
+                                                (optional)
+                                            </small>
+                                        </Label>
                                         <input
                                             type="text"
                                             name="contact_number"
@@ -226,10 +314,13 @@ export default function Create() {
                                         />
                                         <div className="error">
                                             {errors.contact_number && (
-                                                <span>{errors.contact_number}</span>
+                                                <span>
+                                                    {errors.contact_number}
+                                                </span>
                                             )}
                                         </div>
                                     </div>
+
                                     <div>
                                         <Label>Gender:</Label>
 
@@ -242,17 +333,21 @@ export default function Create() {
                                                 {
                                                     label: 'Male',
                                                     value: 'male',
-                                                    icon: <MdBoy />
+                                                    icon: 'FaMale',
                                                 },
                                                 {
                                                     label: 'Female',
                                                     value: 'female',
-                                                    icon: <MdGirl />
+                                                    icon: 'FaFemale',
                                                 },
                                             ]}
                                             getOptionLabel={(option) => (
-                                                <div className='flex items-center gap-3'>
-                                                    {option.icon}
+                                                <div className="flex items-center gap-3">
+                                                    <IconPickerItem
+                                                        value={option.icon}
+                                                        size={24}
+                                                        color="#000"
+                                                    />
                                                     <span>{option.label}</span>
                                                 </div>
                                             )}
@@ -273,7 +368,7 @@ export default function Create() {
                                         </div>
                                     </div>
 
-                                    <div>
+                                    {/* <div>
                                         <Label>Date of Birth:</Label>
 
                                         <input
@@ -283,21 +378,60 @@ export default function Create() {
                                         />
                                         <div className="error">
                                             {errors.date_of_birth && (
-                                                <span>{errors.date_of_birth}</span>
+                                                <span>
+                                                    {errors.date_of_birth}
+                                                </span>
                                             )}
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
 
-                                <span className="divider divider-start text-lg underline pt-8 pb-5">
+                                <div className="divider divider-start text-lg underline pt-8">
                                     System Credentials
-                                </span>
+                                </div>
 
                                 <div>
                                     <div>
+                                        <Label>Role:</Label>
+
+                                        <Select
+                                            className="w-full select-container"
+                                            classNamePrefix="select"
+                                            placeholder="Role * (required)"
+                                            closeMenuOnSelect={true}
+                                            options={roleOptions}
+                                            onChange={(selectedValue) =>
+                                                handleSelectedOptions(
+                                                    'role_id',
+                                                    selectedValue,
+                                                )
+                                            }
+                                            getOptionLabel={(option) => (
+                                                <div className="flex items-center gap-3">
+                                                    <IconPickerItem
+                                                        value={option.icon}
+                                                        size={24}
+                                                        color="#000"
+                                                    />
+                                                    <span>{option.label}</span>
+                                                </div>
+                                            )}
+                                            value={selectedState.role}
+                                            styles={getSingleStyle(mode)}
+                                            isClearable
+                                        />
+                                        <div className="error">
+                                            {errors.role_id && (
+                                                <span>{errors.role_id}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div>
                                         <Label>
                                             Email:{' '}
-                                            <span className="text-red-500">*</span>
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </Label>
                                         <input
                                             type="email"
@@ -312,34 +446,12 @@ export default function Create() {
                                             )}
                                         </div>
                                     </div>
-                                    {/* <div>
-                                    <Label>Role:</Label>
-
-                                    <Select
-                                        className="w-full select-container"
-                                        classNamePrefix="select"
-                                        placeholder="Role * (required)"
-                                        closeMenuOnSelect={true}
-                                        options={roles}
-                                        onChange={(selectedValue) =>
-                                            handleSelectedOptions(
-                                                'role_id',
-                                                selectedValue,
-                                            )
-                                        }
-                                        value={selectedState.role}
-                                        isClearable
-                                    />
-                                    <div className="error">
-                                        {errors.role_id && (
-                                            <span>{errors.role_id}</span>
-                                        )}
-                                    </div>
-                                </div> */}
                                     <div>
                                         <Label>
                                             Password:{' '}
-                                            <span className="text-red-500">*</span>
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </Label>
                                         <input
                                             type="password"
@@ -357,7 +469,9 @@ export default function Create() {
                                     <div>
                                         <Label>
                                             Confirm Password:{' '}
-                                            <span className="text-red-500">*</span>
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </Label>
                                         <input
                                             type="password"
@@ -374,9 +488,13 @@ export default function Create() {
                                         type="submit"
                                         disabled={processing}
                                         className="button"
+                                        onClick={handleSubmit}
                                     >
                                         {processing ? (
-                                            <span className="loading loading-spinner loading-xs"></span>
+                                            <ActivityIndicator
+                                                size="small"
+                                                color="#00ff00"
+                                            />
                                         ) : (
                                             <UserPlus className="h-4 w-4" />
                                         )}
@@ -390,4 +508,51 @@ export default function Create() {
             </div>
         </>
     );
-}
+};
+
+const styles = StyleSheet.create({
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        height: '500px',
+        width: '50%',
+    },
+    button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+    },
+    buttonOpen: {
+        backgroundColor: '#F194FF',
+    },
+    buttonClose: {
+        backgroundColor: '#2196F3',
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+    },
+});
+
+export default Create;
