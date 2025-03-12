@@ -30,7 +30,6 @@ export const getAllUsers = async () => {
 // };
 
 export const storeUser = async (data) => {
-
     try {
         const formData = new FormData();
         for (const key in data) {
@@ -48,11 +47,11 @@ export const storeUser = async (data) => {
         console.log('store user success', response);
         return {
             error: false,
-            msg: "New has been successfully created!",
+            msg: 'New User has been successfully created!',
             data: response.data,
-        }
-
+        };
     } catch (error) {
+        console.log('errorerrorerrorerror', error);
         throw error;
         // console.error('Error uploading user:', error);
         // return {

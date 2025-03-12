@@ -1,15 +1,14 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@app/*": [
-        "app/*"
-      ]
-    }
-  },
-  "extends": "expo/tsconfig.base",
-  "include": [
-    "app/**/*",
-    "nativewind-env.d.ts"
-  ]
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@app/*": ["app/*"]
+        }
+    },
+    "extends": "expo/tsconfig.base",
+    "include": [
+        "app/**/*",
+        "nativewind-env.d.ts",
+        "components/web/users/CreateModal.js"
+    ]
 }

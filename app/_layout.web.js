@@ -44,11 +44,11 @@ export default function RootLayout() {
             {/* Main Content Area */}
             <div
                 className="flex-1 flex flex-col"
-            // style={{
-            //     backgroundImage: 'url(/images/pcmc_bg.jpg)',
-            //     backgroundSize: 'cover',
-            //     backgroundPosition: 'center',
-            // }}
+                // style={{
+                //     backgroundImage: 'url(/images/pcmc_bg.jpg)',
+                //     backgroundSize: 'cover',
+                //     backgroundPosition: 'center',
+                // }}
             >
                 <ToastContainer />
                 <Header toggleSidebar={handleToggleSidebar} />

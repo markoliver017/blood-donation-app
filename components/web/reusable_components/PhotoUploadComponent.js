@@ -1,14 +1,10 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Avatar } from 'flowbite-react';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
 import { useColorScheme } from 'react-native';
-
-// toast.success('Success fetching users!', {
-//     position: 'bottom-right',
-//     autoClose: 5000,
-// });
+import { API_HOST } from '@env';
 
 const baseStyle = {
     flex: 1,
@@ -52,9 +48,24 @@ export default function PhotoUploadComponent({
 }) {
     const mode = useColorScheme();
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
-    const [userPhoto, setUserPhoto] = useState(photo);
+    const [userPhoto, setUserPhoto] = useState(null);
+
+    useEffect(() => {
+        if (!photo) {
+            setUserPhoto(null);
+        } else {
+            if (photo && photo.type == 'online') {
+                setUserPhoto(photo.url);
+            } else {
+                setUserPhoto(
+                    `${API_HOST}${photo?.url || '/uploads/default.png'}`,
+                );
+            }
+        }
+    }, [photo]);
 
     const handleDrop = useCallback((acceptedFiles) => {
+        // debugger;
         const { allowedFiles, notAllowedFiles } = acceptedFiles.reduce(
             (acc, file) => {
                 if (allowedTypes.includes(file.type)) {
@@ -166,19 +177,13 @@ export default function PhotoUploadComponent({
 
             <aside className="w-full">{thumbs}</aside>
 
-            {/* {userPhoto && (
+            {userPhoto && (
                 <aside className="w-full">
                     <div className="flex flex-col justify-between items-center p-2 border-2 border-gray-400 border-dashed rounded text-center">
-                        <Avatar
-                            img={`${assetUrl}/uploads/user_photo/${
-                                userPhoto || 'avatar.png'
-                            }`}
-                            alt={userPhoto}
+                        <img
+                            crossOrigin="anonymous"
                             className="min-h-52 w-auto cursor-pointer"
-                            placeholderInitials="AV"
-                            size="2xl"
-                            rounded
-                            bordered
+                            src={userPhoto}
                         />
 
                         <button
@@ -189,7 +194,7 @@ export default function PhotoUploadComponent({
                         </button>
                     </div>
                 </aside>
-            )} */}
+            )}
         </div>
     );
 }
