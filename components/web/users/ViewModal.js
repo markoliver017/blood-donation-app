@@ -7,7 +7,10 @@ import {
     ActivityIndicator,
     ScrollView,
     useColorScheme,
+    Switch,
+    Alert,
 } from 'react-native';
+import { motion } from 'framer-motion';
 import Modal from 'react-native-modal';
 import PhotoUploadComponent from '@components/web/reusable_components/PhotoUploadComponent';
 import { Label, ToggleSwitch } from 'flowbite-react';
@@ -15,10 +18,12 @@ import { getSingleStyle } from '@components/web/custom/select-styles';
 import { CircleX, UserPlus } from 'lucide-react';
 import { IconPickerItem } from 'react-icons-picker';
 import Select from 'react-select';
-import { storeUser } from '@/api/users/usersQuery';
+import { updateUser } from '@/api/users/usersQuery';
 import { getAllRoles } from '@/api/roles/rolesQuery';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaExclamationCircle } from 'react-icons/fa';
+import clsx from 'clsx';
+import SweetAlert from '../helper/SweetAlert';
 
 const genderOptions = [
     {
@@ -58,6 +63,7 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
             role_id: roleOptions.find((role) => role.id == user.Role?.id),
         },
     );
+
     const initialData = {
         first_name: user?.first_name || '',
         last_name: user?.last_name || '',
@@ -67,35 +73,32 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
         contact_number: user?.contact_number || '',
         gender: user?.gender || '',
         email: user?.email || '',
-        role_id: user?.role_id || '',
-        file: '',
+        role_id: user?.Role?.id || '',
         isChangePassword: false,
     };
 
     const [files, setFiles] = useState([]);
     const [data, setData] = useState(initialData);
+    const [fileData, setFileData] = useState({
+        file: null,
+        photo_id: user.photo_id || null,
+        user_id: user.id
+    });
 
     useEffect(() => {
-        setData((prev) => ({
+        setFileData((prev) => ({
             ...prev,
             ['file']: files[0],
         }));
     }, [files]);
 
     useEffect(() => {
-        console.log('dataaaaaaaaaaaaaaaaaaa', data);
-    }, [data]);
-
-    useEffect(() => {
         console.log('useeeeeeeeerrr', user);
-        // console.log('dataaaaaaaaaaaaaaaaaaaa', data);
-        // console.log('errors', errors);
+        console.log('dataaaaaaaaaaaaaaaaaaa', data);
+        console.log('errors', errors);
         console.log('selectedOptions role', selectedState);
+    }, [data, user, errors, selectedState]);
 
-        // if (isOpen) {
-        //     handleReset();
-        // }
-    }, [isOpen]);
 
     const handleReset = () => {
         setData(initialData);
@@ -128,10 +131,23 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
         }));
     };
 
-    const saveUser = async (data) => {
+    const handleUpdateUser = (data) => {
+
+        SweetAlert({
+            title: "Update User Information",
+            text: "Are you sure you want to update this user?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'Cancel',
+            callback: () => handleSave(data),
+            cbCancel: () => setProcessing(false)
+        })
+    };
+    const handleSave = async (data) => {
         try {
-            const response = await storeUser(data);
-            console.log('responseee successss', response);
+            const response = await updateUser(user.id, data);
+            console.log('update responseee successss', response);
             if (!response.error) {
                 toast.success(response.msg, {
                     position: 'top-right',
@@ -143,7 +159,9 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                 onUpdate();
             }
         } catch (error) {
+
             if (error.response) {
+
                 const errorData = error.response.data?.errors || {};
                 const errorArray = Object.keys(errorData);
                 if (errorArray.length) {
@@ -154,6 +172,7 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                         });
                     });
                     setErrors(errorData);
+
                 } else {
                     const errMessage = error.response?.data?.error;
 
@@ -164,22 +183,24 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                         });
                     }
                 }
+
             } else {
                 toast.error(error.message, {
                     position: 'bottom-right',
                     autoClose: 5000,
                 });
             }
+
         } finally {
             setProcessing(false);
         }
-    };
+    }
+
 
     const handleSubmit = (e) => {
-        alert('submit');
         setProcessing(true);
         e.preventDefault();
-        saveUser(data);
+        handleUpdateUser(data);
     };
 
     return (
@@ -188,6 +209,7 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                 isVisible={isOpen}
                 onBackdropPress={onClose}
                 style={styles.modal}
+                id='form-modal'
             >
                 <ToastContainer />
                 <View style={styles.centeredView}>
@@ -491,8 +513,25 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                                     </div> */}
                                                 </div>
 
-                                                <div className="divider divider-start text-lg underline pt-8 dark:text-blue-500">
-                                                    System Credentials
+                                                <div className="divider divider-start text-lg underline pt-8 dark:text-blue-500 flex justify-between">
+                                                    <div className='flex-1'>
+                                                        System Credentials
+                                                    </div>
+                                                    <div className='flex-items-center'>
+                                                        <Label>Change Password: </Label>
+                                                        <Switch
+                                                            activeThumbColor="#fff"
+                                                            activeTrackColor="#794BC4"
+                                                            value={data.isChangePassword}
+                                                            onValueChange={() => {
+                                                                setData((prev) => ({
+                                                                    ...prev,
+                                                                    ['isChangePassword']:
+                                                                        !data.isChangePassword,
+                                                                }))
+                                                            }}
+                                                        />
+                                                    </div>
                                                 </div>
 
                                                 <div>
@@ -583,77 +622,73 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                                                             )}
                                                         </div>
                                                     </div>
-                                                    <button
-                                                        type="button"
-                                                        className="button"
-                                                        onClick={() =>
-                                                            setData((prev) => ({
-                                                                ...prev,
-                                                                ['isChangePassword']:
-                                                                    !data.isChangePassword,
-                                                            }))
-                                                        }
+
+                                                    <motion.div
+                                                        initial={{ opacity: 0, height: 0 }}
+                                                        animate={{ opacity: data.isChangePassword ? 1 : 0, height: data.isChangePassword ? 'auto' : 0 }}
+                                                        transition={{ duration: 0.5 }}
+                                                        className={clsx(!data.isChangePassword && "pointer-events-none")}
                                                     >
-                                                        CLick me
-                                                    </button>
-                                                    <div>
-                                                        <Label>
-                                                            Password:{' '}
-                                                            <span className="text-red-500">
-                                                                *
-                                                            </span>
-                                                        </Label>
-                                                        <input
-                                                            type="password"
-                                                            name="password"
-                                                            value={
-                                                                data.password
-                                                            }
-                                                            onChange={
-                                                                handleInputChange
-                                                            }
-                                                            className="input"
-                                                        />
-                                                        <div className="error">
-                                                            {errors.password && (
-                                                                <span className="flex-items-center">
-                                                                    <FaExclamationCircle className="h-3 w-3" />{' '}
-                                                                    {
-                                                                        errors.password
-                                                                    }
+
+                                                        <div>
+                                                            <Label>
+                                                                Password:{' '}
+                                                                <span className="text-red-500">
+                                                                    *
                                                                 </span>
-                                                            )}
+                                                            </Label>
+                                                            <input
+                                                                type="password"
+                                                                name="password"
+                                                                value={
+                                                                    data.password
+                                                                }
+                                                                onChange={
+                                                                    handleInputChange
+                                                                }
+                                                                className="input"
+                                                            />
+                                                            <div className="error">
+                                                                {errors.password && (
+                                                                    <span className="flex-items-center">
+                                                                        <FaExclamationCircle className="h-3 w-3" />{' '}
+                                                                        {
+                                                                            errors.password
+                                                                        }
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div>
-                                                        <Label>
-                                                            Confirm Password:{' '}
-                                                            <span className="text-red-500">
-                                                                *
-                                                            </span>
-                                                        </Label>
-                                                        <input
-                                                            type="password"
-                                                            name="passwordConfirmation"
-                                                            value={
-                                                                data.passwordConfirmation
-                                                            }
-                                                            onChange={
-                                                                handleInputChange
-                                                            }
-                                                            className="input"
-                                                        />
-                                                        <div className="error">
-                                                            {errors.password && (
-                                                                <span className="flex-items-center">
-                                                                    <FaExclamationCircle className="h-3 w-3" />{' '}
-                                                                    {
-                                                                        errors.password
-                                                                    }
+                                                        <div>
+                                                            <Label>
+                                                                Confirm Password:{' '}
+                                                                <span className="text-red-500">
+                                                                    *
                                                                 </span>
-                                                            )}
+                                                            </Label>
+                                                            <input
+                                                                type="password"
+                                                                name="passwordConfirmation"
+                                                                value={
+                                                                    data.passwordConfirmation
+                                                                }
+                                                                onChange={
+                                                                    handleInputChange
+                                                                }
+                                                                className="input"
+                                                            />
+                                                            <div className="error">
+                                                                {errors.password && (
+                                                                    <span className="flex-items-center">
+                                                                        <FaExclamationCircle className="h-3 w-3" />{' '}
+                                                                        {
+                                                                            errors.password
+                                                                        }
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    </motion.div>
                                                 </div>
                                             </form>
                                         </div>
@@ -700,6 +735,7 @@ const styles = StyleSheet.create({
     modal: {
         justifyContent: 'center',
         margin: 0,
+        zIndex: 10
     },
     centeredView: {
         flex: 1,
@@ -720,7 +756,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
         minHeight: '500px',
-        maxHeight: '100vh',
+        maxHeight: '95vh',
         width: 'auto',
     },
     scrollViewContent: {

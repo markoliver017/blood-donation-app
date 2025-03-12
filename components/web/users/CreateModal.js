@@ -693,7 +693,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
         minHeight: '500px',
-        maxHeight: '100vh',
+        maxHeight: '95vh',
         width: 'auto',
     },
     scrollViewContent: {

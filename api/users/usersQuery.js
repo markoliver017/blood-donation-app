@@ -60,3 +60,28 @@ export const storeUser = async (data) => {
         // }
     }
 };
+
+export const updateUser = async (user_id, data) => {
+    try {
+
+        const response = await axiosInstance({
+            method: 'put',
+            url: `/users/${user_id}`,
+            data: data,
+        });
+        console.log('update user success', response);
+        return {
+            error: false,
+            msg: 'User has been successfully updated!',
+            data: response.data,
+        };
+    } catch (error) {
+        console.log('errorerrorerrorerror', error);
+        throw error;
+        // console.error('Error uploading user:', error);
+        // return {
+        //     error: true,
+        //     msg: error.response.data.errors
+        // }
+    }
+};
