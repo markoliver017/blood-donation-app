@@ -18,6 +18,7 @@ import Select from 'react-select';
 import { storeUser } from '@/api/users/usersQuery';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaExclamationCircle } from 'react-icons/fa';
+import SweetAlert from '@components/web/helper/SweetAlert';
 
 /* reducer function */
 const updateSelectOptions = (state, action) => {
@@ -112,14 +113,11 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
             const response = await storeUser(data);
             console.log('responseee successss', response);
             if (!response.error) {
-                toast.success(response.msg, {
-                    position: 'top-right',
-                    autoClose: 5000,
+                onClose();
+                onSave({
+                    status: 'success',
+                    message: response.msg,
                 });
-                setTimeout(() => {
-                    onClose();
-                }, 1000);
-                onSave();
             }
         } catch (error) {
             if (error.response) {
@@ -155,10 +153,19 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
     };
 
     const handleSubmit = (e) => {
-        alert('submit');
         setProcessing(true);
         e.preventDefault();
-        saveUser(data);
+
+        SweetAlert({
+            title: 'New User',
+            text: 'Are you sure you want to add this user?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'Cancel',
+            onConfirm: () => saveUser(data), //useState data
+            onCancel: () => setProcessing(false),
+        });
     };
 
     return (
@@ -167,6 +174,7 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
                 isVisible={isOpen}
                 onBackdropPress={onClose}
                 style={styles.modal}
+                id="form-modal"
             >
                 <ToastContainer />
                 <View style={styles.centeredView}>

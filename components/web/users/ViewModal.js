@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer, useState } from 'react';
+import { API_HOST } from '@env';
 import {
     StyleSheet,
     Text,
@@ -15,15 +16,15 @@ import Modal from 'react-native-modal';
 import PhotoUploadComponent from '@components/web/reusable_components/PhotoUploadComponent';
 import { Label, ToggleSwitch } from 'flowbite-react';
 import { getSingleStyle } from '@components/web/custom/select-styles';
-import { CircleX, UserPlus } from 'lucide-react';
+import { CircleX, Save, UserPlus } from 'lucide-react';
 import { IconPickerItem } from 'react-icons-picker';
 import Select from 'react-select';
-import { updateUser } from '@/api/users/usersQuery';
+import { updateUser, updateUserPhoto } from '@/api/users/usersQuery';
 import { getAllRoles } from '@/api/roles/rolesQuery';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaExclamationCircle } from 'react-icons/fa';
 import clsx from 'clsx';
-import SweetAlert from '../helper/SweetAlert';
+import SweetAlert from '@components/web/helper/SweetAlert';
 
 const genderOptions = [
     {
@@ -51,11 +52,19 @@ const updateSelectOptions = (state, action) => {
     return { ...state, [type]: selected };
 };
 
-const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
+const ViewModal = ({
+    isOpen,
+    onClose,
+    onUpdate,
+    roleOptions,
+    user,
+    onRefresh,
+}) => {
     const mode = useColorScheme();
 
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
+    const [processingPhoto, setProcessingPhoto] = useState(false);
     const [selectedState, dispatchSelectedState] = useReducer(
         updateSelectOptions,
         {
@@ -75,22 +84,24 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
         email: user?.email || '',
         role_id: user?.Role?.id || '',
         isChangePassword: false,
+        password: '',
+        passwordConfirmation: '',
     };
 
     const [files, setFiles] = useState([]);
     const [data, setData] = useState(initialData);
-    const [fileData, setFileData] = useState({
-        file: null,
-        photo_id: user.photo_id || null,
-        user_id: user.id
-    });
+    const [userPhoto, setUserPhoto] = useState(null);
 
     useEffect(() => {
-        setFileData((prev) => ({
-            ...prev,
-            ['file']: files[0],
-        }));
-    }, [files]);
+        if (!user.File) return;
+        const photo = user.File;
+
+        if (photo.type == 'online') {
+            setUserPhoto(photo.url);
+        } else {
+            setUserPhoto(`${API_HOST}${photo?.url || '/uploads/default.png'}`);
+        }
+    }, []);
 
     useEffect(() => {
         console.log('useeeeeeeeerrr', user);
@@ -98,7 +109,6 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
         console.log('errors', errors);
         console.log('selectedOptions role', selectedState);
     }, [data, user, errors, selectedState]);
-
 
     const handleReset = () => {
         setData(initialData);
@@ -131,37 +141,19 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
         }));
     };
 
-    const handleUpdateUser = (data) => {
-
-        SweetAlert({
-            title: "Update User Information",
-            text: "Are you sure you want to update this user?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: 'Yes',
-            cancelButtonText: 'Cancel',
-            callback: () => handleSave(data),
-            cbCancel: () => setProcessing(false)
-        })
-    };
     const handleSave = async (data) => {
         try {
             const response = await updateUser(user.id, data);
             console.log('update responseee successss', response);
             if (!response.error) {
-                toast.success(response.msg, {
-                    position: 'top-right',
-                    autoClose: 5000,
+                onUpdate({
+                    status: 'success',
+                    message: response.msg,
                 });
-                setTimeout(() => {
-                    onClose();
-                }, 1000);
-                onUpdate();
+                onClose();
             }
         } catch (error) {
-
             if (error.response) {
-
                 const errorData = error.response.data?.errors || {};
                 const errorArray = Object.keys(errorData);
                 if (errorArray.length) {
@@ -172,7 +164,6 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                         });
                     });
                     setErrors(errorData);
-
                 } else {
                     const errMessage = error.response?.data?.error;
 
@@ -183,24 +174,54 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                         });
                     }
                 }
-
             } else {
                 toast.error(error.message, {
                     position: 'bottom-right',
                     autoClose: 5000,
                 });
             }
-
         } finally {
             setProcessing(false);
         }
-    }
+    };
 
+    const handleSavePhoto = async () => {
+        setProcessingPhoto(true);
+        if (!files.length) {
+            alert('No files uploaded!');
+            return;
+        }
+        try {
+            const fileData = { file: files[0] };
+            const response = await updateUserPhoto(user.id, fileData);
+            console.log('handle saving photo responseee successss', response);
+            if (!response.error) {
+                toast.success(response.msg);
+                setUserPhoto(`${API_HOST}${response.filePath}`);
+                setFiles([]);
+                onRefresh();
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setProcessingPhoto(false);
+        }
+    };
 
     const handleSubmit = (e) => {
         setProcessing(true);
         e.preventDefault();
-        handleUpdateUser(data);
+
+        SweetAlert({
+            title: 'Update User Information',
+            text: 'Are you sure you want to update this user?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'Cancel',
+            onConfirm: () => handleSave(data), //useState data
+            onCancel: () => setProcessing(false),
+        });
     };
 
     return (
@@ -209,14 +230,14 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                 isVisible={isOpen}
                 onBackdropPress={onClose}
                 style={styles.modal}
-                id='form-modal'
+                id="form-modal"
             >
-                <ToastContainer />
                 <View style={styles.centeredView}>
                     <View
                         style={styles.modalView}
                         className="bg-white dark:bg-gray-800"
                     >
+                        <ToastContainer />
                         <Pressable
                             style={[styles.button]}
                             className="bg-gray-500 absolute right-5 top-5 z-50 hover:ring hover:ring-red-300"
@@ -236,7 +257,10 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                                             <PhotoUploadComponent
                                                 files={files}
                                                 setFiles={setFiles}
-                                                photo={user?.File}
+                                                userPhoto={userPhoto}
+                                                changePhoto={() =>
+                                                    setUserPhoto(null)
+                                                }
                                             />
                                             <div className="error">
                                                 {errors.user_photo && (
@@ -245,6 +269,30 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                                                     </span>
                                                 )}
                                             </div>
+                                            {files.length !== 0 && (
+                                                <div>
+                                                    <button
+                                                        className="button bg-orange-600 w-full"
+                                                        onClick={
+                                                            handleSavePhoto
+                                                        }
+                                                    >
+                                                        <div className="flex-items-center w-full">
+                                                            {processingPhoto ? (
+                                                                <ActivityIndicator
+                                                                    size="small"
+                                                                    color="#00ff00"
+                                                                />
+                                                            ) : (
+                                                                <Save className="h-4 w-4" />
+                                                            )}
+                                                            <div className="w-full flex-1 text-center">
+                                                                Save Photo
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="flex-1 w-full space-y-3 p-5">
@@ -514,21 +562,27 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                                                 </div>
 
                                                 <div className="divider divider-start text-lg underline pt-8 dark:text-blue-500 flex justify-between">
-                                                    <div className='flex-1'>
+                                                    <div className="flex-1">
                                                         System Credentials
                                                     </div>
-                                                    <div className='flex-items-center'>
-                                                        <Label>Change Password: </Label>
+                                                    <div className="flex-items-center">
+                                                        <Label>
+                                                            Change Password:{' '}
+                                                        </Label>
                                                         <Switch
                                                             activeThumbColor="#fff"
                                                             activeTrackColor="#794BC4"
-                                                            value={data.isChangePassword}
+                                                            value={
+                                                                data.isChangePassword
+                                                            }
                                                             onValueChange={() => {
-                                                                setData((prev) => ({
-                                                                    ...prev,
-                                                                    ['isChangePassword']:
-                                                                        !data.isChangePassword,
-                                                                }))
+                                                                setData(
+                                                                    (prev) => ({
+                                                                        ...prev,
+                                                                        ['isChangePassword']:
+                                                                            !data.isChangePassword,
+                                                                    }),
+                                                                );
                                                             }}
                                                         />
                                                     </div>
@@ -624,12 +678,27 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                                                     </div>
 
                                                     <motion.div
-                                                        initial={{ opacity: 0, height: 0 }}
-                                                        animate={{ opacity: data.isChangePassword ? 1 : 0, height: data.isChangePassword ? 'auto' : 0 }}
-                                                        transition={{ duration: 0.5 }}
-                                                        className={clsx(!data.isChangePassword && "pointer-events-none")}
+                                                        initial={{
+                                                            opacity: 0,
+                                                            height: 0,
+                                                        }}
+                                                        animate={{
+                                                            opacity:
+                                                                data.isChangePassword
+                                                                    ? 1
+                                                                    : 0,
+                                                            height: data.isChangePassword
+                                                                ? 'auto'
+                                                                : 0,
+                                                        }}
+                                                        transition={{
+                                                            duration: 0.5,
+                                                        }}
+                                                        className={clsx(
+                                                            !data.isChangePassword &&
+                                                                'pointer-events-none',
+                                                        )}
                                                     >
-
                                                         <div>
                                                             <Label>
                                                                 Password:{' '}
@@ -661,7 +730,8 @@ const ViewModal = ({ isOpen, onClose, onUpdate, roleOptions, user }) => {
                                                         </div>
                                                         <div>
                                                             <Label>
-                                                                Confirm Password:{' '}
+                                                                Confirm
+                                                                Password:{' '}
                                                                 <span className="text-red-500">
                                                                     *
                                                                 </span>
@@ -735,7 +805,7 @@ const styles = StyleSheet.create({
     modal: {
         justifyContent: 'center',
         margin: 0,
-        zIndex: 10
+        zIndex: 10,
     },
     centeredView: {
         flex: 1,

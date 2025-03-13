@@ -79,7 +79,7 @@ export function DataTable({ data, columns }) {
     };
 
     return (
-        <div className="">
+        <div>
             {/* <Button onClick={getSelectedRows}>Get Data</Button> */}
             <div className="flex items-center py-2 space-x-2">
                 <input
@@ -120,7 +120,7 @@ export function DataTable({ data, columns }) {
             </div>
 
             {/* DataTable */}
-            <div className="rounded-md">
+            <div id="user_datatable" className="rounded-md">
                 <Table className="dark:bg-slate-700 dark:text-slate-200">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -133,10 +133,10 @@ export function DataTable({ data, columns }) {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                header.column.columnDef
-                                                    .header,
-                                                header.getContext(),
-                                            )}
+                                                  header.column.columnDef
+                                                      .header,
+                                                  header.getContext(),
+                                              )}
                                     </TableHead>
                                 ))}
                             </TableRow>

@@ -44,25 +44,11 @@ const rejectStyle = {
 export default function PhotoUploadComponent({
     files,
     setFiles,
-    photo = null,
+    userPhoto = null,
+    changePhoto = () => {},
 }) {
     const mode = useColorScheme();
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
-    const [userPhoto, setUserPhoto] = useState(null);
-
-    useEffect(() => {
-        if (!photo) {
-            setUserPhoto(null);
-        } else {
-            if (photo && photo.type == 'online') {
-                setUserPhoto(photo.url);
-            } else {
-                setUserPhoto(
-                    `${API_HOST}${photo?.url || '/uploads/default.png'}`,
-                );
-            }
-        }
-    }, [photo]);
 
     const handleDrop = useCallback((acceptedFiles) => {
         // debugger;
@@ -188,7 +174,7 @@ export default function PhotoUploadComponent({
 
                         <button
                             className="btn btn-sm btn-neutral w-24 mt-2"
-                            onClick={() => setUserPhoto(null)}
+                            onClick={changePhoto}
                         >
                             Change
                         </button>

@@ -15,6 +15,7 @@ module.exports = function (api) {
                         '@app': './app',
                         '@api': './api',
                         '@components': './components',
+                        '^react-native$': 'react-native-web',
                     },
                 },
             ],
@@ -30,6 +31,7 @@ module.exports = function (api) {
                     verbose: false,
                 },
             ],
+            'react-native-web',
         ],
     };
 };

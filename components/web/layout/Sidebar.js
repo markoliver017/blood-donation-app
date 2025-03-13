@@ -13,6 +13,7 @@ import {
     ListPlus,
     Settings,
     SquareUser,
+    Users,
 } from 'lucide-react';
 import SideNavList from './SideNavList';
 
@@ -30,8 +31,8 @@ export default function Sidebar({
 
     return (
         <motion.aside
-            initial={{ width: '270px' }}
-            animate={{ width: isCollapsed ? '70px' : '270px' }}
+            initial={{ width: '290px' }}
+            animate={{ width: isCollapsed ? '70px' : '290px' }}
         >
             <LinearGradient
                 colors={
@@ -102,7 +103,7 @@ export default function Sidebar({
                             <li>
                                 <SideNavList
                                     isCollapsed={isCollapsed}
-                                    path="/settings"
+                                    path="#"
                                     Icon={<Settings />}
                                     name="Settings"
                                 />
@@ -126,8 +127,8 @@ export default function Sidebar({
                                     <ListPlus />
                                     {!isCollapsed && (
                                         <>
-                                            <span className="flex-1">
-                                                Dropdown
+                                            <span className="flex-1 text-base truncate">
+                                                System Administration
                                             </span>
                                             {dropdownOpen['dropdown'] ? (
                                                 <CircleChevronDown className="w-4" />
@@ -148,9 +149,9 @@ export default function Sidebar({
                                     <li className="mt-2">
                                         <SideNavList
                                             isCollapsed={isCollapsed}
-                                            path="/dropdown"
-                                            Icon={<Droplet />}
-                                            name="Dropdown"
+                                            path="/users"
+                                            Icon={<Users />}
+                                            name="Users Management"
                                         />
                                     </li>
                                 </ul>

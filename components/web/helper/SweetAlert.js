@@ -10,11 +10,12 @@ export default function SweetAlert({
     showCancelButton = false,
     confirmButtonText = 'Yes',
     cancelButtonText = 'Cancel',
-    callback = () => { },
-    cbCancel = () => { },
+    onConfirm = () => {},
+    onCancel = () => {},
+    element_id = 'form-modal',
 }) {
     MySwal.fire({
-        target: document.getElementById('form-modal'),
+        target: document.getElementById(element_id),
         title: <p>{title}</p>,
         text,
         icon,
@@ -22,11 +23,13 @@ export default function SweetAlert({
         confirmButtonText,
         cancelButtonText,
     }).then((result) => {
-        console.log("resultresultresultresult", result)
-        if (result.isConfirmed && typeof callback === 'function') {
-            callback();
-        } else if (result.dismiss === Swal.DismissReason.cancel && typeof cbCancel === 'function') {
-            cbCancel();
+        if (result.isConfirmed && typeof onConfirm === 'function') {
+            onConfirm();
+        } else if (
+            result.dismiss === Swal.DismissReason.cancel &&
+            typeof onCancel === 'function'
+        ) {
+            onCancel();
         }
     });
 }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { getAllUsers, deleteUser } from '@/api/users/usersQuery';
 import { getAllRoles } from '@/api/roles/rolesQuery';
 import Create from '@components/web/users/CreateModal';
 import ViewModal from '@components/web/users/ViewModal';
@@ -6,22 +7,24 @@ import { Dropdown } from 'flowbite-react';
 import DataTableColumnHeader from '@components/web/reusable_components/DataTableColumnHeader';
 import { DataTable } from '@components/web/users/DataTable';
 import { columns } from '@components/web/users/UserColumns';
+import clsx from 'clsx';
 
 import {
     CirclePlus,
     Command,
     Delete,
     DeleteIcon,
+    EditIcon,
     Eye,
     ListTodo,
     MenuIcon,
     MoreHorizontal,
+    UserIcon,
     ViewIcon,
 } from 'lucide-react';
 
-import { getAllUsers } from '@/api/users/usersQuery';
 import SweetAlert from '@/components/web/helper/SweetAlert';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 
 const App = () => {
     const [users, setUsers] = useState([]);
@@ -29,6 +32,7 @@ const App = () => {
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [createModalVisible, setCreateModalVisible] = useState(false);
     const [roleOptions, setRoleOptions] = useState([]);
+    const [processing, setProcessing] = useState(false);
 
     const handleOpenModalView = (user) => {
         setUserOnViewData(user);
@@ -57,38 +61,120 @@ const App = () => {
                 })),
             );
         } catch (error) {
-            console.error('Error fetching rolessss:', error);
+            if (error.name === 'AxiosError') {
+                toast.error(
+                    error.message + ' - Please contact your administrator.',
+                    {
+                        position: 'bottom-right',
+                        autoClose: 5000,
+                    },
+                );
+            }
         }
     };
 
     const fetchUsers = async () => {
         try {
+            setProcessing(true);
             const usersData = await getAllUsers();
             setUsers(usersData);
         } catch (error) {
-            toast.error(
-                'Error fetching users: ' + error.response.data.message,
-                {
-                    position: 'bottom-right',
-                    autoClose: 5000,
-                },
-            );
-            SweetAlert({
-                title: 'Error',
-                text: 'Error fetching users: ' + error.response.data.message,
-                icon: 'error',
-                showCancelButton: false,
-                confirmButtonText: 'OK',
-            });
+            if (error.name === 'AxiosError') {
+                SweetAlert({
+                    title: 'Fetching Users',
+                    text:
+                        error.message + ' - Please contact your administrator.',
+                    icon: 'error',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK',
+                });
+            }
+
+            if (error.response) {
+                SweetAlert({
+                    title: 'Error',
+                    text:
+                        'Error fetching users: ' + error.response.data.message,
+                    icon: 'error',
+                    showCancelButton: false,
+                    confirmButtonText: 'OK',
+                });
+            }
+        } finally {
+            setTimeout(() => {
+                setProcessing(false);
+            }, 500);
         }
     };
 
+    const handleUpdate = (data) => {
+        SweetAlert({
+            element_id: 'users_container',
+            icon: data.status,
+            text: data.message,
+        });
+        fetchUsers();
+    };
+
+    const handleUserDeletion = (user_id) => {
+        SweetAlert({
+            title: 'User Deletion?',
+            text: 'Are you sure you want to delete this user?',
+            showCancelButton: true,
+            onConfirm: () => processDeleteUser(user_id),
+        });
+    };
+
+    const processDeleteUser = async (user_id) => {
+        try {
+            const response = await deleteUser(user_id);
+            if (!response.error) {
+                SweetAlert({
+                    title: 'User Deletion',
+                    text: response.msg,
+                    icon: 'success',
+                    confirmButtonText: 'Okay',
+                });
+                fetchUsers();
+            }
+        } catch (error) {
+            if (error.name === 'AxiosError') {
+                SweetAlert({
+                    title: 'User Deletion',
+                    text:
+                        error.message + ' - Please contact your administrator.',
+                    icon: 'error',
+                    confirmButtonText: 'Okay',
+                });
+            }
+
+            if (error.response) {
+                const errorResponse = error.response?.data?.error;
+                if (typeof errorResponse == 'string') {
+                    SweetAlert({
+                        title: 'Error',
+                        text:
+                            'There was an error while trying to delete the user: ' +
+                            errorResponse,
+                        icon: 'error',
+                        confirmButtonText: 'Okay',
+                    });
+                }
+            }
+        }
+    };
     return (
-        <div>
+        <div
+            id="users_container"
+            className={clsx(
+                processing ? 'animate-pulse' : 'animate-none',
+                'p-6 space-y-4',
+            )}
+        >
             <Create
                 isOpen={createModalVisible}
                 onClose={() => setCreateModalVisible(false)}
-                onSave={fetchUsers}
+                onSave={handleUpdate}
                 roleOptions={roleOptions}
             />
 
@@ -96,71 +182,98 @@ const App = () => {
                 <ViewModal
                     isOpen={viewModalVisible}
                     onClose={handleCloseModalView}
-                    onUpdate={fetchUsers}
+                    onUpdate={handleUpdate}
                     roleOptions={roleOptions}
                     user={userOnViewData}
+                    onRefresh={fetchUsers}
                 />
             )}
-            <button
-                className="button bg-green-800 dark:text-slate-200 hover:bg-green-900"
-                onClick={() => setCreateModalVisible(true)}
-            >
-                <CirclePlus />
-                Create
-            </button>
 
-            <DataTable
-                data={users}
-                columns={[
-                    ...columns,
-                    {
-                        id: 'actions',
-                        header: ({ column }) => (
-                            <DataTableColumnHeader
-                                column={column}
-                                title="Action"
-                            />
-                        ),
-                        cell: ({ row }) => {
-                            const userData = row.original;
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold dark:text-white">
+                    Users Management
+                </h2>
+                <button
+                    className="px-4 py-2 bg-green-800 text-white rounded-md hover:bg-green-900 transition"
+                    onClick={() => setCreateModalVisible(true)}
+                >
+                    <CirclePlus className="inline-block mr-2" /> Create
+                </button>
+            </div>
 
-                            return (
-                                <Dropdown
-                                    label={<MenuIcon />}
-                                    arrowIcon={false}
-                                    inline
-                                    className=" bg-white dark:text-slate-200"
-                                >
-                                    <Dropdown.Header className="dark:text-slate-200 border-b">
-                                        <span className="block text-xs">
-                                            Available Actions
-                                        </span>
-                                    </Dropdown.Header>
-                                    <Dropdown.Item
-                                        className="p-2 hover:shadow dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-300"
-                                        icon={Eye}
-                                        onClick={() =>
-                                            handleOpenModalView(userData)
+            {users.length === 0 ? (
+                <div className="flex flex-col items-center justify-center space-y-4 p-10 border rounded-md shadow-lg dark:bg-gray-800">
+                    <UserIcon className="w-16 h-16 text-gray-400" />
+                    <p className="text-gray-500 dark:text-gray-300">
+                        No users found.
+                    </p>
+                    <button
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                        onClick={() => setCreateModalVisible(true)}
+                    >
+                        Add a User
+                    </button>
+                </div>
+            ) : (
+                <DataTable
+                    data={users}
+                    columns={[
+                        ...columns,
+                        {
+                            id: 'actions',
+                            header: ({ column }) => (
+                                <DataTableColumnHeader
+                                    column={column}
+                                    title="Action"
+                                />
+                            ),
+                            cell: ({ row }) => {
+                                const userData = row.original;
+                                return (
+                                    <Dropdown
+                                        label={
+                                            <span className="text-lg">
+                                                &#8942;
+                                            </span>
                                         }
+                                        className="bg-white dark:text-white"
+                                        inline
                                     >
-                                        View
-                                    </Dropdown.Item>
-
-                                    <Dropdown.Divider />
-                                    <Dropdown.Item
-                                        className="p-2 hover:shadow dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-300"
-                                        icon={Delete}
-                                    >
-                                        Delete
-                                    </Dropdown.Item>
-                                </Dropdown>
-                            );
+                                        <Dropdown.Header className="dark:text-slate-200 border-b">
+                                            <p className="text-xs">
+                                                Available Actions
+                                            </p>
+                                            <p className="text-sm font-bold">
+                                                User: {userData.name}
+                                            </p>
+                                        </Dropdown.Header>
+                                        <Dropdown.Item
+                                            className="p-2 hover:shadow text-gray-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400"
+                                            onClick={() =>
+                                                handleUpdate(userData)
+                                            }
+                                        >
+                                            <EditIcon className="inline-block mr-2" />{' '}
+                                            Edit
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            className="p-2 hover:shadow text-gray-700 hover:text-red-600 dark:text-slate-200 dark:hover:text-red-600"
+                                            onClick={() =>
+                                                handleDelete(userData.id)
+                                            }
+                                        >
+                                            <Delete className="inline-block mr-2" />{' '}
+                                            Delete
+                                        </Dropdown.Item>
+                                    </Dropdown>
+                                );
+                            },
                         },
-                    },
-                ]}
-            />
+                    ]}
+                    className="shadow-md rounded-md overflow-hidden bg-white dark:bg-gray-800"
+                />
+            )}
         </div>
     );
 };
-
 export default App;

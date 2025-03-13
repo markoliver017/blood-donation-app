@@ -6,28 +6,9 @@ export const getAllUsers = async () => {
         const response = await axiosInstance.get('/users');
         return response.data;
     } catch (error) {
-        console.error('Error fetching users:', error);
         throw error;
     }
 };
-
-// export const storeUser = async (data) => {
-//     console.log('storeUser', data);
-//     try {
-//         const formData = new FormData();
-//         for (const key in data) {
-//             formData.append(key, data[key]);
-//         }
-//         console.log('forrrmdata', formData);
-//         const response = await axiosInstance.post('/users', formData, {
-//             headers: 'multipart/form-data',
-//         });
-//         return response.data;
-//     } catch (error) {
-//         console.error('Error storing user:', error);
-//         throw error;
-//     }
-// };
 
 export const storeUser = async (data) => {
     try {
@@ -51,37 +32,64 @@ export const storeUser = async (data) => {
             data: response.data,
         };
     } catch (error) {
-        console.log('errorerrorerrorerror', error);
         throw error;
-        // console.error('Error uploading user:', error);
-        // return {
-        //     error: true,
-        //     msg: error.response.data.errors
-        // }
     }
 };
 
 export const updateUser = async (user_id, data) => {
     try {
-
         const response = await axiosInstance({
             method: 'put',
             url: `/users/${user_id}`,
             data: data,
         });
-        console.log('update user success', response);
         return {
             error: false,
             msg: 'User has been successfully updated!',
             data: response.data,
         };
     } catch (error) {
-        console.log('errorerrorerrorerror', error);
         throw error;
-        // console.error('Error uploading user:', error);
-        // return {
-        //     error: true,
-        //     msg: error.response.data.errors
-        // }
+    }
+};
+
+export const updateUserPhoto = async (user_id, data) => {
+    try {
+        const formData = new FormData();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+        const response = await axiosInstance({
+            method: 'put',
+            url: `/users/${user_id}/files`,
+            data: formData,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return {
+            error: false,
+            msg: response.data.message,
+            filePath: response.data.filePath,
+        };
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deleteUser = async (user_id) => {
+    try {
+        const response = await axiosInstance({
+            method: 'delete',
+            url: `/users/${user_id}`,
+        });
+        console.log('handleUserDeletion success', response);
+        return {
+            error: false,
+            msg: 'User has been successfully deleted!',
+            data: response.data,
+        };
+    } catch (error) {
+        throw error;
     }
 };
