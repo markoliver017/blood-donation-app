@@ -14,7 +14,7 @@ import {
 import { motion } from 'framer-motion';
 import Modal from 'react-native-modal';
 import PhotoUploadComponent from '@components/web/reusable_components/PhotoUploadComponent';
-import { Label, ToggleSwitch } from 'flowbite-react';
+import { Label } from 'flowbite-react';
 import { getSingleStyle } from '@components/web/custom/select-styles';
 import { CircleX, Save, UserPlus } from 'lucide-react';
 import { IconPickerItem } from 'react-icons-picker';
@@ -25,6 +25,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { FaExclamationCircle } from 'react-icons/fa';
 import clsx from 'clsx';
 import SweetAlert from '@components/web/helper/SweetAlert';
+import PhotoLinkComponent from '../reusable_components/PhotoLinkComponent';
 
 const genderOptions = [
     {
@@ -89,6 +90,7 @@ const ViewModal = ({
     };
 
     const [files, setFiles] = useState([]);
+    const [fileType, setFileType] = useState(user.File?.type || 'file_upload');
     const [data, setData] = useState(initialData);
     const [userPhoto, setUserPhoto] = useState(null);
 
@@ -141,12 +143,20 @@ const ViewModal = ({
         }));
     };
 
+    const handleFileTypeChange = (e) => {
+        const { value } = e.target;
+
+        setFileType(value);
+        setFiles([]);
+        setUserPhoto(null);
+    };
     const handleSave = async (data) => {
         try {
             const response = await updateUser(user.id, data);
             console.log('update responseee successss', response);
             if (!response.error) {
                 onUpdate({
+                    title: 'Update User Information',
                     status: 'success',
                     message: response.msg,
                 });
@@ -192,7 +202,7 @@ const ViewModal = ({
             return;
         }
         try {
-            const fileData = { file: files[0] };
+            const fileData = { type: fileType, file: files[0] };
             const response = await updateUserPhoto(user.id, fileData);
             console.log('handle saving photo responseee successss', response);
             if (!response.error) {
@@ -205,6 +215,23 @@ const ViewModal = ({
             console.error(error);
         } finally {
             setProcessingPhoto(false);
+        }
+    };
+
+    const handleSaveLink = async () => {
+        if (!userPhoto) {
+            alert('Invalid URL.');
+            return;
+        }
+        try {
+            const fileData = { type: fileType, url: userPhoto };
+            const response = await updateUserPhoto(user.id, fileData);
+            if (!response.error) {
+                toast.success(response.msg);
+                onRefresh();
+            }
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -254,45 +281,119 @@ const ViewModal = ({
                                 <div className="w-full max-w-6xl shadow-md rounded p-5 bg-gray-200 dark:bg-slate-700">
                                     <div className="flex flex-wrap">
                                         <div className="flex-none w-full md:w-1/4 p-5">
-                                            <PhotoUploadComponent
-                                                files={files}
-                                                setFiles={setFiles}
-                                                userPhoto={userPhoto}
-                                                changePhoto={() =>
-                                                    setUserPhoto(null)
-                                                }
-                                            />
-                                            <div className="error">
-                                                {errors.user_photo && (
-                                                    <span>
-                                                        {errors.user_photo}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            {files.length !== 0 && (
-                                                <div>
-                                                    <button
-                                                        className="button bg-orange-600 w-full"
-                                                        onClick={
-                                                            handleSavePhoto
+                                            {fileType == 'file_upload' && (
+                                                <>
+                                                    <PhotoUploadComponent
+                                                        files={files}
+                                                        setFiles={setFiles}
+                                                        userPhoto={userPhoto}
+                                                        changePhoto={() =>
+                                                            setUserPhoto(null)
                                                         }
-                                                    >
-                                                        <div className="flex-items-center w-full">
-                                                            {processingPhoto ? (
-                                                                <ActivityIndicator
-                                                                    size="small"
-                                                                    color="#00ff00"
-                                                                />
-                                                            ) : (
-                                                                <Save className="h-4 w-4" />
-                                                            )}
-                                                            <div className="w-full flex-1 text-center">
-                                                                Save Photo
-                                                            </div>
+                                                    />
+                                                    <div className="error">
+                                                        {errors.user_photo && (
+                                                            <span>
+                                                                {
+                                                                    errors.user_photo
+                                                                }
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    {files.length !== 0 && (
+                                                        <div>
+                                                            <button
+                                                                className="button bg-orange-600 w-full"
+                                                                onClick={
+                                                                    handleSavePhoto
+                                                                }
+                                                            >
+                                                                <div className="flex-items-center w-full">
+                                                                    {processingPhoto ? (
+                                                                        <ActivityIndicator
+                                                                            size="small"
+                                                                            color="#00ff00"
+                                                                        />
+                                                                    ) : (
+                                                                        <Save className="h-4 w-4" />
+                                                                    )}
+                                                                    <div className="w-full flex-1 text-center">
+                                                                        Save
+                                                                        Photo
+                                                                    </div>
+                                                                </div>
+                                                            </button>
                                                         </div>
-                                                    </button>
-                                                </div>
+                                                    )}
+                                                </>
                                             )}
+                                            {fileType == 'online' && (
+                                                <>
+                                                    <PhotoLinkComponent
+                                                        link={userPhoto}
+                                                        setLink={setUserPhoto}
+                                                    />
+                                                    {userPhoto && (
+                                                        <div className="mt-2">
+                                                            <button
+                                                                className="button bg-orange-600 w-full"
+                                                                onClick={
+                                                                    handleSaveLink
+                                                                }
+                                                            >
+                                                                <div className="flex-items-center w-full">
+                                                                    {processingPhoto ? (
+                                                                        <ActivityIndicator
+                                                                            size="small"
+                                                                            color="#00ff00"
+                                                                        />
+                                                                    ) : (
+                                                                        <Save className="h-4 w-4" />
+                                                                    )}
+                                                                    <div className="w-full flex-1 text-center">
+                                                                        Save
+                                                                        Photo
+                                                                    </div>
+                                                                </div>
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+                                            <div className="flex justify-between px-4 py-2">
+                                                <Label>
+                                                    <input
+                                                        type="radio"
+                                                        name="file_type"
+                                                        value="file_upload"
+                                                        checked={
+                                                            fileType ===
+                                                            'file_upload'
+                                                        }
+                                                        onChange={
+                                                            handleFileTypeChange
+                                                        }
+                                                        className="radio bg-red-100 border-red-300 checked:bg-red-200 checked:text-red-600 checked:border-red-600"
+                                                    />
+                                                    &nbsp;File Upload
+                                                </Label>
+                                                <Label>
+                                                    <input
+                                                        type="radio"
+                                                        name="file_type"
+                                                        value="online"
+                                                        checked={
+                                                            fileType ===
+                                                            'online'
+                                                        }
+                                                        onChange={
+                                                            handleFileTypeChange
+                                                        }
+                                                        className="radio bg-blue-100 border-blue-300 checked:bg-blue-200 checked:text-blue-600 checked:border-blue-600"
+                                                    />
+                                                    &nbsp;Link
+                                                </Label>
+                                            </div>
                                         </div>
 
                                         <div className="flex-1 w-full space-y-3 p-5">
@@ -561,8 +662,8 @@ const ViewModal = ({
                                     </div> */}
                                                 </div>
 
-                                                <div className="divider divider-start text-lg underline pt-8 dark:text-blue-500 flex justify-between">
-                                                    <div className="flex-1">
+                                                <div className="divider divider-start text-lg pt-8 dark:text-blue-500 flex justify-between">
+                                                    <div className="flex-1 underline">
                                                         System Credentials
                                                     </div>
                                                     <div className="flex-items-center">

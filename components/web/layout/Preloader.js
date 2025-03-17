@@ -12,7 +12,7 @@ export default function Preloader({ isLoading }) {
         >
             {/* Linear Gradient Background */}
             <LinearGradient
-                colors={['#1E3A8A', '#2563EB']} // Deep blue to bright blue gradient
+                colors={['#fff', '#f7f7f7']} // Deep blue to bright blue gradient
                 start={[0, 0]}
                 end={[1, 1]}
                 style={{
@@ -24,7 +24,7 @@ export default function Preloader({ isLoading }) {
 
             {/* Animated Loading Text */}
             <motion.div
-                className="text-2xl font-semibold text-white relative"
+                className="text-2xl font-semibold text-blue-500 relative"
                 initial={{ scale: 1 }}
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ repeat: Infinity, duration: 1 }}

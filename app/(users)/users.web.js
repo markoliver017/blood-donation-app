@@ -16,6 +16,7 @@ import {
     DeleteIcon,
     EditIcon,
     Eye,
+    EyeIcon,
     ListTodo,
     MenuIcon,
     MoreHorizontal,
@@ -110,6 +111,7 @@ const App = () => {
     const handleUpdate = (data) => {
         SweetAlert({
             element_id: 'users_container',
+            title: data.title || 'Notification',
             icon: data.status,
             text: data.message,
         });
@@ -232,11 +234,12 @@ const App = () => {
                                 return (
                                     <Dropdown
                                         label={
-                                            <span className="text-lg">
+                                            <span className="button bg-gray-200 text-black">
                                                 &#8942;
                                             </span>
                                         }
                                         className="bg-white dark:text-white"
+                                        arrowIcon={false}
                                         inline
                                     >
                                         <Dropdown.Header className="dark:text-slate-200 border-b">
@@ -244,22 +247,22 @@ const App = () => {
                                                 Available Actions
                                             </p>
                                             <p className="text-sm font-bold">
-                                                User: {userData.name}
+                                                User: {userData.full_name}
                                             </p>
                                         </Dropdown.Header>
                                         <Dropdown.Item
                                             className="p-2 hover:shadow text-gray-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400"
                                             onClick={() =>
-                                                handleUpdate(userData)
+                                                handleOpenModalView(userData)
                                             }
                                         >
-                                            <EditIcon className="inline-block mr-2" />{' '}
-                                            Edit
+                                            <EyeIcon className="inline-block mr-2" />{' '}
+                                            View
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             className="p-2 hover:shadow text-gray-700 hover:text-red-600 dark:text-slate-200 dark:hover:text-red-600"
                                             onClick={() =>
-                                                handleDelete(userData.id)
+                                                handleUserDeletion(userData.id)
                                             }
                                         >
                                             <Delete className="inline-block mr-2" />{' '}

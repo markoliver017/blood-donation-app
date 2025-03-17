@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import PhotoUploadComponent from '@components/web/reusable_components/PhotoUploadComponent';
-import { Label } from 'flowbite-react';
+import PhotoLinkComponent from '@components/web/reusable_components/PhotoLinkComponent';
+import { Avatar, Label } from 'flowbite-react';
 import { getSingleStyle } from '@components/web/custom/select-styles';
 import { CircleX, UserPlus } from 'lucide-react';
 import { IconPickerItem } from 'react-icons-picker';
@@ -56,6 +57,8 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
         passwordConfirmation: '',
         file: '',
         role_id: '',
+        file_type: 'file_upload',
+        photo_url: '',
     };
 
     const [files, setFiles] = useState([]);
@@ -89,6 +92,17 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
         });
     };
 
+    const handleFileTypeChange = (e) => {
+        const { value } = e.target;
+
+        setData((prev) => ({
+            ...prev,
+            file_type: value,
+            photo_url: '',
+        }));
+        setFiles([]);
+    };
+
     const handleSelectedOptions = (type, selected) => {
         setData((prev) => ({
             ...prev,
@@ -111,34 +125,42 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
     const saveUser = async (data) => {
         try {
             const response = await storeUser(data);
-            console.log('responseee successss', response);
             if (!response.error) {
                 onClose();
                 onSave({
+                    title: 'Add New User',
                     status: 'success',
                     message: response.msg,
                 });
             }
         } catch (error) {
             if (error.response) {
-                const errorData = error.response.data?.errors || {};
-                const errorArray = Object.keys(errorData);
-                if (errorArray.length) {
-                    errorArray.forEach((key) => {
-                        toast.error(errorData[key], {
-                            position: 'bottom-right',
-                            autoClose: 5000,
-                        });
+                const errors = error.response.data;
+                if (typeof errors == 'string') {
+                    toast.error(errors, {
+                        position: 'bottom-right',
+                        autoClose: 5000,
                     });
-                    setErrors(errorData);
                 } else {
-                    const errMessage = error.response?.data?.error;
-
-                    if (typeof errMessage == 'string') {
-                        toast.error(errMessage, {
-                            position: 'bottom-right',
-                            autoClose: 5000,
+                    const errorData = error.response.data?.errors || {};
+                    const errorArray = Object.keys(errorData);
+                    if (errorArray.length) {
+                        errorArray.forEach((key) => {
+                            toast.error(errorData[key], {
+                                position: 'bottom-right',
+                                autoClose: 5000,
+                            });
                         });
+                        setErrors(errorData);
+                    } else {
+                        const errMessage = error.response?.data?.error;
+
+                        if (typeof errMessage == 'string') {
+                            toast.error(errMessage, {
+                                position: 'bottom-right',
+                                autoClose: 5000,
+                            });
+                        }
                     }
                 }
             } else {
@@ -197,18 +219,84 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
                             <div className="flex justify-center items-center ">
                                 <div className="w-full max-w-6xl shadow-md rounded p-5 bg-gray-200 dark:bg-slate-700">
                                     <div className="flex flex-wrap">
-                                        <div className="flex-none w-full md:w-1/4 p-5">
-                                            <PhotoUploadComponent
-                                                files={files}
-                                                setFiles={setFiles}
-                                            />
-                                            <div className="error">
-                                                {errors.user_photo && (
-                                                    <span>
-                                                        {errors.user_photo}
-                                                    </span>
-                                                )}
+                                        <div className="flex-none w-full md:w-1/4 ">
+                                            {data.file_type ==
+                                                'file_upload' && (
+                                                <>
+                                                    <PhotoUploadComponent
+                                                        files={files}
+                                                        setFiles={setFiles}
+                                                    />
+                                                    <div className="error">
+                                                        {errors.user_photo && (
+                                                            <span>
+                                                                {
+                                                                    errors.user_photo
+                                                                }
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </>
+                                            )}
+                                            {data.file_type == 'online' && (
+                                                <PhotoLinkComponent
+                                                    link={data.photo_url}
+                                                    setLink={(link) =>
+                                                        setData((prev) => ({
+                                                            ...prev,
+                                                            photo_url: link,
+                                                        }))
+                                                    }
+                                                />
+                                            )}
+
+                                            <div className="flex justify-between px-4 py-2">
+                                                <Label>
+                                                    <input
+                                                        type="radio"
+                                                        name="file_type"
+                                                        value="file_upload"
+                                                        checked={
+                                                            data.file_type ===
+                                                            'file_upload'
+                                                        }
+                                                        onChange={
+                                                            handleFileTypeChange
+                                                        }
+                                                        className="radio bg-red-100 border-red-300 checked:bg-red-200 checked:text-red-600 checked:border-red-600"
+                                                    />
+                                                    &nbsp;File Upload
+                                                </Label>
+                                                <Label>
+                                                    <input
+                                                        type="radio"
+                                                        name="file_type"
+                                                        value="online"
+                                                        checked={
+                                                            data.file_type ===
+                                                            'online'
+                                                        }
+                                                        onChange={
+                                                            handleFileTypeChange
+                                                        }
+                                                        className="radio bg-blue-100 border-blue-300 checked:bg-blue-200 checked:text-blue-600 checked:border-blue-600"
+                                                    />
+                                                    &nbsp;Link
+                                                </Label>
                                             </div>
+                                            {/* {data.file_type == 'link' && (
+                                                <div>
+                                                    <input
+                                                        className="input"
+                                                        name="photo_url"
+                                                        placeholder="Input valid photo url/link"
+                                                        value={data.photo_url}
+                                                        onChange={
+                                                            handleInputChange
+                                                        }
+                                                    />
+                                                </div>
+                                            )} */}
                                         </div>
 
                                         <div className="flex-1 w-full space-y-3 p-5">
