@@ -34,7 +34,7 @@ export const columns = [
     {
         accessorKey: 'Users',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Name" />
+            <DataTableColumnHeader column={column} title="No of Users" />
         ),
         cell: ({ getValue }) => getValue().length,
     },

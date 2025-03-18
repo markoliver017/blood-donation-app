@@ -30,16 +30,15 @@ export const columns = [
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Name" />
         ),
+        filterFn: "columnFilter",
     },
     {
+        id: "role_name",
         accessorKey: 'Role.role_name',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Role" />
         ),
-        // cell: ({ row }) => {
-        //     const data = row.original;
-        //     return <div className="flex items-center">{data.email}</div>;
-        // },
+        filterFn: "columnFilter",
     },
     {
         accessorKey: 'email',

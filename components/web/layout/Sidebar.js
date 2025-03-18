@@ -13,6 +13,7 @@ import {
     ListPlus,
     Settings,
     SquareUser,
+    UserRoundCog,
     Users,
 } from 'lucide-react';
 import SideNavList from './SideNavList';
@@ -152,6 +153,14 @@ export default function Sidebar({
                                             path="/users"
                                             Icon={<Users />}
                                             name="Users Management"
+                                        />
+                                    </li>
+                                    <li className="mt-2">
+                                        <SideNavList
+                                            isCollapsed={isCollapsed}
+                                            path="/roles"
+                                            Icon={<UserRoundCog />}
+                                            name="Roles Management"
                                         />
                                     </li>
                                 </ul>

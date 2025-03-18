@@ -9,18 +9,20 @@ import { DataTable } from '@components/web/users/DataTable';
 import { columns } from '@components/web/users/UserColumns';
 import clsx from 'clsx';
 
-import { CirclePlus, Delete, EyeIcon, UserIcon } from 'lucide-react';
+import { CirclePlus, Delete, EyeIcon, UserCog, UserIcon } from 'lucide-react';
 
 import SweetAlert from '@/components/web/helper/SweetAlert';
 import { toast } from 'react-toastify';
+import useRoleStore from '@/store/useRoleStore';
 
 const App = () => {
+    const { roles, fetchRoles } = useRoleStore();
     const [users, setUsers] = useState([]);
     const [userOnViewData, setUserOnViewData] = useState(null);
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [createModalVisible, setCreateModalVisible] = useState(false);
     const [roleOptions, setRoleOptions] = useState([]);
-    const [processing, setProcessing] = useState(false);
+    const [processing, setProcessing] = useState(true);
 
     const handleOpenModalView = (user) => {
         setUserOnViewData(user);
@@ -37,35 +39,24 @@ const App = () => {
         fetchRoles();
     }, []);
 
-    const fetchRoles = async () => {
-        try {
-            const rolesData = await getAllRoles();
-            setRoleOptions(
-                rolesData.map((role) => ({
-                    label: role.role_name,
-                    value: role.role_name,
-                    icon: role.icon,
-                    id: role.id,
-                })),
-            );
-        } catch (error) {
-            if (error.name === 'AxiosError') {
-                toast.error(
-                    error.message + ' - Please contact your administrator.',
-                    {
-                        position: 'bottom-right',
-                        autoClose: 5000,
-                    },
-                );
-            }
-        }
-    };
+    useEffect(() => {
+        setRoleOptions(
+            roles.map((role) => ({
+                label: role.role_name,
+                value: role.role_name,
+                icon: UserCog,
+                id: role.id,
+            })),
+        );
+    }, [roles]);
 
     const fetchUsers = async () => {
         try {
             setProcessing(true);
             const usersData = await getAllUsers();
             setUsers(usersData);
+            setProcessing(false);
+
         } catch (error) {
             if (error.name === 'AxiosError') {
                 SweetAlert({
@@ -88,10 +79,9 @@ const App = () => {
                     confirmButtonText: 'OK',
                 });
             }
-        } finally {
-            setTimeout(() => {
-                setProcessing(false);
-            }, 500);
+        }
+        finally {
+
         }
     };
 
@@ -180,7 +170,7 @@ const App = () => {
 
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold dark:text-white">
-                    Users Management
+                    Users Management ( <small>{users.length} </small>)
                 </h2>
                 <button
                     className="px-4 py-2 bg-green-800 text-white rounded-md hover:bg-green-900 transition"
@@ -206,6 +196,7 @@ const App = () => {
             ) : (
                 <DataTable
                     data={users}
+                    roleOptions={roleOptions}
                     columns={[
                         ...columns,
                         {

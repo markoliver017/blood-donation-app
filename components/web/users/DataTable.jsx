@@ -19,10 +19,10 @@ import {
 } from '@/components/web/ui/table';
 import { DataTablePagination } from '@/components/web/reusable_components/DataTablePagination';
 import { DataTableViewOptions } from '@/components/web/reusable_components/DataTableViewOptions';
-import { Building, Filter, User } from 'lucide-react';
+import { Building, Filter, User, UserCog2 } from 'lucide-react';
 import MultiSelect from '@/components/web/reusable_components/MultiSelect';
 
-export function DataTable({ data, columns }) {
+export function DataTable({ data, columns, roleOptions }) {
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [globalFilter, setGlobalFilter] = useState([]);
@@ -53,17 +53,10 @@ export function DataTable({ data, columns }) {
             rowSelection,
         },
         onGlobalFilterChange: setGlobalFilter,
-        filterFns: {
+        filterFns: { //for multi-filter
             columnFilter: (row, columnId, filterValue) => {
-                console.log(`Filtering ${columnId}:`, {
-                    rowValue: row.getValue(columnId),
-                    filterValue,
-                });
-
-                if (!Array.isArray(filterValue) || filterValue.length === 0)
-                    return true; // No filter, return all rows
-
-                return filterValue.includes(row.getValue(columnId));
+                if (filterValue.length === 0) return true; // No filter, return all
+                return filterValue.includes(row.getValue(columnId)); // Match selected emails
             },
         },
     });
@@ -83,10 +76,6 @@ export function DataTable({ data, columns }) {
             }));
         });
     }, [data, table]);
-
-    useEffect(() => {
-        console.log('Filtered Rows::::::', table.getFilteredRowModel().rows);
-    }, [table.getFilteredRowModel()]);
 
     const getSelectedRows = () => {
         const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -110,11 +99,31 @@ export function DataTable({ data, columns }) {
                             <Filter className="h-4 w-4" />
                         </label>
                         <MultiSelect
+                            options={roleOptions}
+                            onValueChange={(selectedOptions) => {
+                                console.log("row columnsssssssssss", table.getColumn("role_name"))
+                                table.getColumn("role_name")?.setFilterValue(selectedOptions);
+                            }}
+                            value={
+                                table
+                                    .getColumn('role_name')
+                                    ?.getFilterValue() ?? []
+                            }
+                            placeholder={
+                                <>
+                                    {<UserCog2 className="h-3 w-3" />}{' '}
+                                    <span>Role</span>
+                                </>
+                            }
+                            // variant="inverted"
+                            className="text-slate-700 bg-slate-100 hover:bg-white"
+                            animation={2}
+                            maxCount={1}
+                        />
+                        <MultiSelect
                             options={userOptions}
                             onValueChange={(selectedOptions) => {
-                                const column = table.getColumn('full_name');
-                                console.log('Setting colum name:', column);
-                                column.setFilterValue(selectedOptions ?? []);
+                                table.getColumn("full_name")?.setFilterValue(selectedOptions);
                             }}
                             value={
                                 table
@@ -151,10 +160,10 @@ export function DataTable({ data, columns }) {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext(),
-                                              )}
+                                                header.column.columnDef
+                                                    .header,
+                                                header.getContext(),
+                                            )}
                                     </TableHead>
                                 ))}
                             </TableRow>

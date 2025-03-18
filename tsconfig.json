@@ -2,12 +2,25 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@app/*": ["app/*"]
+            "@/*": [
+                "./*"
+            ],
+            "@app/*": [
+                "app/*"
+            ],
+            "@api/*": [
+                "./api/*"
+            ],
+            "@components/*": [
+                "./components/*"
+            ]
         }
     },
     "extends": "expo/tsconfig.base",
     "include": [
         "app/**/*",
+        "api/**/*",
+        "**/*",
         "nativewind-env.d.ts",
         "components/web/users/CreateModal.js"
     ]

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { CirclePlus, Delete, EyeIcon, UserIcon } from 'lucide-react';
-import { DataTable } from '@components/web/roles/DataTable';
+import { DataTable } from '@/components/web/roles/DataTable';
 import { columns } from '@components/web/roles/RoleColumns';
 import DataTableColumnHeader from '@components/web/reusable_components/DataTableColumnHeader';
 import { Dropdown } from 'flowbite-react';
@@ -13,12 +13,14 @@ export default function Page() {
     const { roles, fetchRoles } = useRoleStore();
 
     useEffect(() => {
-        fetchRoles().catch((error) => {
-            toast.error('Failed to fetch roles: ' + error.message, {
-                position: 'bottom-right',
-                autoClose: 5000,
+        if (!roles.length) {
+            fetchRoles().catch((error) => {
+                toast.error('Failed to fetch roles: ' + error.message, {
+                    position: 'bottom-right',
+                    autoClose: 5000,
+                });
             });
-        });
+        }
     }, []);
 
     return (
@@ -35,7 +37,7 @@ export default function Page() {
                 </h2>
                 <button
                     className="px-4 py-2 bg-green-800 text-white rounded-md hover:bg-green-900 transition"
-                    // onClick={() => setCreateModalVisible(true)}
+                // onClick={() => setCreateModalVisible(true)}
                 >
                     <CirclePlus className="inline-block mr-2" /> Create
                 </button>
@@ -49,7 +51,7 @@ export default function Page() {
                     </p>
                     <button
                         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                        // onClick={() => setCreateModalVisible(true)}
+                    // onClick={() => setCreateModalVisible(true)}
                     >
                         Add a Role
                     </button>
@@ -91,18 +93,18 @@ export default function Page() {
                                         </Dropdown.Header>
                                         <Dropdown.Item
                                             className="p-2 hover:shadow text-gray-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400"
-                                            // onClick={() =>
-                                            //     handleOpenModalView(userData)
-                                            // }
+                                        // onClick={() =>
+                                        //     handleOpenModalView(userData)
+                                        // }
                                         >
                                             <EyeIcon className="inline-block mr-2" />{' '}
                                             View
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             className="p-2 hover:shadow text-gray-700 hover:text-red-600 dark:text-slate-200 dark:hover:text-red-600"
-                                            // onClick={() =>
-                                            //     handleUserDeletion(userData.id)
-                                            // }
+                                        // onClick={() =>
+                                        //     handleUserDeletion(userData.id)
+                                        // }
                                         >
                                             <Delete className="inline-block mr-2" />{' '}
                                             Delete

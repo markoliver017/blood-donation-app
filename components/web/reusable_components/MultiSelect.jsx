@@ -38,9 +38,8 @@ const multiSelectVariants = (variant) => {
             'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
         inverted: 'inverted',
     };
-    return `m-1 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 ${
-        variants[variant || 'default']
-    }`;
+    return `m-1 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 ${variants[variant || 'default']
+        }`;
 };
 
 const MultiSelect = forwardRef(
@@ -157,9 +156,9 @@ const MultiSelect = forwardRef(
                                                     )}
                                                     {option?.label.length > 15
                                                         ? `${option.label.substring(
-                                                              0,
-                                                              15,
-                                                          )}...`
+                                                            0,
+                                                            15,
+                                                        )}...`
                                                         : option.label}
                                                     <XCircle
                                                         className="ml-2 h-4 w-4 cursor-pointer"
@@ -184,9 +183,8 @@ const MultiSelect = forwardRef(
                                                 animationDuration: `${animation}s`,
                                             }}
                                         >
-                                            {`+ ${
-                                                selectedValues.length - maxCount
-                                            } more`}
+                                            {`+ ${selectedValues.length - maxCount
+                                                } more`}
                                             <XCircle
                                                 className="ml-2 h-4 w-4 cursor-pointer"
                                                 onClick={(event) => {
@@ -242,7 +240,7 @@ const MultiSelect = forwardRef(
                                 >
                                     <div
                                         className={cn(
-                                            'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                                            'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-black dark:border-white',
                                             selectedValues.length ===
                                                 options.length
                                                 ? 'bg-primary text-primary-foreground'
@@ -267,7 +265,7 @@ const MultiSelect = forwardRef(
                                         >
                                             <div
                                                 className={cn(
-                                                    'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                                                    'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-black dark:border-white',
                                                     isSelected
                                                         ? 'bg-primary text-primary-foreground'
                                                         : 'opacity-50 [&_svg]:invisible',
