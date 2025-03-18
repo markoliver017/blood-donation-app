@@ -26,35 +26,16 @@ export const columns = [
         enableHiding: false,
     },
     {
-        accessorKey: 'full_name',
+        accessorKey: 'role_name',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Name" />
         ),
     },
     {
-        accessorKey: 'Role.role_name',
+        accessorKey: 'Users',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Role" />
+            <DataTableColumnHeader column={column} title="Name" />
         ),
-        // cell: ({ row }) => {
-        //     const data = row.original;
-        //     return <div className="flex items-center">{data.email}</div>;
-        // },
+        cell: ({ getValue }) => getValue().length,
     },
-    {
-        accessorKey: 'email',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Email" />
-        ),
-        cell: ({ row }) => {
-            const data = row.original;
-            return <div className="flex items-center">{data.email}</div>;
-        },
-    },
-    // {
-    //     accessorKey: 'age',
-    //     header: ({ column }) => (
-    //         <DataTableColumnHeader column={column} title="Age" />
-    //     ),
-    // },
 ];

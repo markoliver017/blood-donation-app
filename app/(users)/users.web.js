@@ -9,23 +9,10 @@ import { DataTable } from '@components/web/users/DataTable';
 import { columns } from '@components/web/users/UserColumns';
 import clsx from 'clsx';
 
-import {
-    CirclePlus,
-    Command,
-    Delete,
-    DeleteIcon,
-    EditIcon,
-    Eye,
-    EyeIcon,
-    ListTodo,
-    MenuIcon,
-    MoreHorizontal,
-    UserIcon,
-    ViewIcon,
-} from 'lucide-react';
+import { CirclePlus, Delete, EyeIcon, UserIcon } from 'lucide-react';
 
 import SweetAlert from '@/components/web/helper/SweetAlert';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const App = () => {
     const [users, setUsers] = useState([]);

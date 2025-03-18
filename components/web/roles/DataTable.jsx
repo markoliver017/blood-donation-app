@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import {
     flexRender,
@@ -19,8 +19,6 @@ import {
 } from '@/components/web/ui/table';
 import { DataTablePagination } from '@/components/web/reusable_components/DataTablePagination';
 import { DataTableViewOptions } from '@/components/web/reusable_components/DataTableViewOptions';
-import { Building, Filter, User } from 'lucide-react';
-import MultiSelect from '@/components/web/reusable_components/MultiSelect';
 
 export function DataTable({ data, columns }) {
     const [sorting, setSorting] = useState([]);
@@ -28,7 +26,6 @@ export function DataTable({ data, columns }) {
     const [globalFilter, setGlobalFilter] = useState([]);
     const [columnVisibility, setColumnVisibility] = useState([]);
     const [rowSelection, setRowSelection] = useState({});
-    const [userOptions, setUserOptions] = useState([]);
 
     const table = useReactTable({
         data,
@@ -54,39 +51,27 @@ export function DataTable({ data, columns }) {
         },
         onGlobalFilterChange: setGlobalFilter,
         filterFns: {
+            //for multi-filter
             columnFilter: (row, columnId, filterValue) => {
-                console.log(`Filtering ${columnId}:`, {
-                    rowValue: row.getValue(columnId),
-                    filterValue,
-                });
-
-                if (!Array.isArray(filterValue) || filterValue.length === 0)
-                    return true; // No filter, return all rows
-
-                return filterValue.includes(row.getValue(columnId));
+                if (filterValue.length === 0) return true; // No filter, return all
+                return filterValue.includes(row.getValue(columnId)); // Match selected emails
             },
         },
     });
 
-    useEffect(() => {
-        setUserOptions(() => {
-            return data.map((element, index) => ({
-                label: element.full_name,
-                value: element.full_name,
-                icon: User,
-                number: table
-                    .getFilteredRowModel()
-                    .rows.filter(
-                        (row) => row.original.full_name === element.full_name,
-                    ).length,
-                key: index,
-            }));
-        });
-    }, [data, table]);
+    // useEffect(() => {
 
-    useEffect(() => {
-        console.log('Filtered Rows::::::', table.getFilteredRowModel().rows);
-    }, [table.getFilteredRowModel()]);
+    //     setOfficeOptions(() => {
+    //         return offices.map((element, index) => ({
+    //                 label: element.name,
+    //                 value: element.name,
+    //                 icon: lucideReactIcons.Building,
+    //                 number: table.getFilteredRowModel().rows.filter(row => row.original.office.name === element.name).length,
+    //                 key: index
+    //             }));
+    //     });
+
+    // }, [offices]);
 
     const getSelectedRows = () => {
         const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -106,33 +91,30 @@ export function DataTable({ data, columns }) {
 
                 <div className="flex-1 flex justify-end pr-2">
                     <div className="flex space-x-2">
-                        <label className="dark:text-slate-400 flex items-center space-x-1">
-                            <Filter className="h-4 w-4" />
+                        {/* <label className="dark:text-slate-400 flex items-center space-x-1">
+                            <lucideReactIcons.Filter className="h-4 w-4" />
                         </label>
                         <MultiSelect
-                            options={userOptions}
+                            options={officeOptions}
                             onValueChange={(selectedOptions) => {
-                                const column = table.getColumn('full_name');
-                                console.log('Setting colum name:', column);
-                                column.setFilterValue(selectedOptions ?? []);
+                                table.getColumn("office_name")?.setFilterValue(selectedOptions);
                             }}
-                            value={
-                                table
-                                    .getColumn('full_name')
-                                    ?.getFilterValue() ?? []
-                            }
-                            placeholder={
-                                <>
-                                    {<Building className="h-3 w-3" />}{' '}
-                                    <span>User</span>
-                                </>
-                            }
+                            value={table.getColumn("office_name")?.getFilterValue() ?? []}
+                            placeholder={<>
+                                {<lucideReactIcons.Building className="h-3 w-3" />} <span>Office</span>
+                            </>}
                             // variant="inverted"
                             className="text-slate-700 bg-slate-100 hover:bg-white"
                             animation={2}
                             maxCount={1}
+                        /> */}
+                        <DataTableViewOptions
+                            table={table}
+                            toggleLabels={{
+                                office_name: 'Office',
+                                office_location_name: 'Location',
+                            }}
                         />
-                        <DataTableViewOptions table={table} />
                     </div>
                 </div>
             </div>

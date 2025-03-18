@@ -35,34 +35,38 @@ const updateSelectOptions = (state, action) => {
     return { ...state, [type]: selected };
 };
 
+const initialData = {
+    first_name: '',
+    last_name: '',
+    middle_name: '',
+    prefix: '',
+    suffix: '',
+    contact_number: '',
+    gender: '',
+    email: '',
+    password: '',
+    passwordConfirmation: '',
+    file: '',
+    role_id: '',
+    file_type: 'file_upload',
+    photo_url: '',
+};
+
 const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
     const mode = useColorScheme();
 
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
+    const [files, setFiles] = useState([]);
+    const [data, setData] = useState(initialData);
+    const [isValidUrl, setIsValidUrl] = useState({
+        status: false,
+        message: '',
+    });
     const [selectedState, dispatchSelectedState] = useReducer(
         updateSelectOptions,
         {},
     );
-    const initialData = {
-        first_name: '',
-        last_name: '',
-        middle_name: '',
-        prefix: '',
-        suffix: '',
-        contact_number: '',
-        gender: '',
-        email: '',
-        password: '',
-        passwordConfirmation: '',
-        file: '',
-        role_id: '',
-        file_type: 'file_upload',
-        photo_url: '',
-    };
-
-    const [files, setFiles] = useState([]);
-    const [data, setData] = useState(initialData);
 
     useEffect(() => {
         setData((prev) => ({
@@ -247,9 +251,14 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
                                                             photo_url: link,
                                                         }))
                                                     }
+                                                    isValidUrl={isValidUrl}
+                                                    setIsValidUrl={
+                                                        setIsValidUrl
+                                                    }
                                                 />
                                             )}
 
+                                            {/* Radio buttons */}
                                             <div className="flex justify-between px-4 py-2">
                                                 <Label>
                                                     <input
@@ -284,19 +293,6 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
                                                     &nbsp;Link
                                                 </Label>
                                             </div>
-                                            {/* {data.file_type == 'link' && (
-                                                <div>
-                                                    <input
-                                                        className="input"
-                                                        name="photo_url"
-                                                        placeholder="Input valid photo url/link"
-                                                        value={data.photo_url}
-                                                        onChange={
-                                                            handleInputChange
-                                                        }
-                                                    />
-                                                </div>
-                                            )} */}
                                         </div>
 
                                         <div className="flex-1 w-full space-y-3 p-5">

@@ -91,6 +91,10 @@ const ViewModal = ({
 
     const [files, setFiles] = useState([]);
     const [fileType, setFileType] = useState(user.File?.type || 'file_upload');
+    const [isValidUrl, setIsValidUrl] = useState({
+        status: false,
+        message: '',
+    });
     const [data, setData] = useState(initialData);
     const [userPhoto, setUserPhoto] = useState(null);
 
@@ -110,6 +114,7 @@ const ViewModal = ({
         console.log('dataaaaaaaaaaaaaaaaaaa', data);
         console.log('errors', errors);
         console.log('selectedOptions role', selectedState);
+        console.log('isValidUrlisValidUrlisValidUrl', isValidUrl);
     }, [data, user, errors, selectedState]);
 
     const handleReset = () => {
@@ -219,10 +224,8 @@ const ViewModal = ({
     };
 
     const handleSaveLink = async () => {
-        if (!userPhoto) {
-            alert('Invalid URL.');
-            return;
-        }
+        setProcessingPhoto(true);
+
         try {
             const fileData = { type: fileType, url: userPhoto };
             const response = await updateUserPhoto(user.id, fileData);
@@ -232,6 +235,8 @@ const ViewModal = ({
             }
         } catch (error) {
             console.error(error);
+        } finally {
+            setProcessingPhoto(false);
         }
     };
 
@@ -280,7 +285,7 @@ const ViewModal = ({
                             <div className="flex justify-center items-center ">
                                 <div className="w-full max-w-6xl shadow-md rounded p-5 bg-gray-200 dark:bg-slate-700">
                                     <div className="flex flex-wrap">
-                                        <div className="flex-none w-full md:w-1/4 p-5">
+                                        <div className="flex-none w-full md:w-1/4">
                                             {fileType == 'file_upload' && (
                                                 <>
                                                     <PhotoUploadComponent
@@ -332,32 +337,39 @@ const ViewModal = ({
                                                     <PhotoLinkComponent
                                                         link={userPhoto}
                                                         setLink={setUserPhoto}
+                                                        isValidUrl={isValidUrl}
+                                                        setIsValidUrl={
+                                                            setIsValidUrl
+                                                        }
                                                     />
-                                                    {userPhoto && (
-                                                        <div className="mt-2">
-                                                            <button
-                                                                className="button bg-orange-600 w-full"
-                                                                onClick={
-                                                                    handleSaveLink
-                                                                }
-                                                            >
-                                                                <div className="flex-items-center w-full">
-                                                                    {processingPhoto ? (
-                                                                        <ActivityIndicator
-                                                                            size="small"
-                                                                            color="#00ff00"
-                                                                        />
-                                                                    ) : (
-                                                                        <Save className="h-4 w-4" />
-                                                                    )}
-                                                                    <div className="w-full flex-1 text-center">
-                                                                        Save
-                                                                        Photo
+                                                    {userPhoto &&
+                                                        isValidUrl.status &&
+                                                        userPhoto !=
+                                                            user.File?.url && (
+                                                            <div className="mt-2">
+                                                                <button
+                                                                    className="button bg-orange-600 w-full"
+                                                                    onClick={
+                                                                        handleSaveLink
+                                                                    }
+                                                                >
+                                                                    <div className="flex-items-center w-full">
+                                                                        {processingPhoto ? (
+                                                                            <ActivityIndicator
+                                                                                size="small"
+                                                                                color="#00ff00"
+                                                                            />
+                                                                        ) : (
+                                                                            <Save className="h-4 w-4" />
+                                                                        )}
+                                                                        <div className="w-full flex-1 text-center">
+                                                                            Save
+                                                                            Photo
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            </button>
-                                                        </div>
-                                                    )}
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                 </>
                                             )}
                                             <div className="flex justify-between px-4 py-2">

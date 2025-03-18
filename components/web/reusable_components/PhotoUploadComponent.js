@@ -5,13 +5,14 @@ import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
 import { useColorScheme } from 'react-native';
 import { API_HOST } from '@env';
+import clsx from 'clsx';
 
 const baseStyle = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '20px',
+    // padding: '20px',
     borderWidth: 2,
     borderRadius: 2,
     borderColor: '#9ca3af',
@@ -95,10 +96,10 @@ export default function PhotoUploadComponent({
                 key={file.name}
                 className="flex flex-col justify-between items-center p-2 border-2 border-gray-400 border-dashed rounded text-center"
             >
-                <Avatar
-                    img={URL.createObjectURL(file)}
+                <img
+                    src={URL.createObjectURL(file)}
                     alt={file.name}
-                    className="min-h-52 w-auto cursor-pointer"
+                    className="h-48 w-80 cursor-pointer"
                     onLoad={() => URL.revokeObjectURL(file)}
                     placeholderInitials="AV"
                     size="2xl"
@@ -140,20 +141,16 @@ export default function PhotoUploadComponent({
     );
 
     return (
-        <div className="file-upload">
+        <div>
             {files.length === 0 && !userPhoto && (
                 <div
                     {...getRootProps({ style })}
-                    className={`${isDragActive ? 'active' : ''}`}
+                    className={clsx('p-1', isDragActive && 'active')}
                 >
                     <input {...getInputProps()} />
-                    <Avatar
-                        alt="Avatar"
-                        className="h-40 w-full text-6xl md:text-7xl xs:text-base font-bold flex items-center justify-center"
-                        placeholderInitials="Photo"
-                        size="2xl"
-                        rounded
-                        bordered
+                    <img
+                        alt="Photo"
+                        className="h-48 w-80 text-4xl md:text-7xl xs:text-base font-bold flex items-center justify-center"
                     />
                     <p>
                         Drag 'n' drop some files here, or click to select files
@@ -168,7 +165,7 @@ export default function PhotoUploadComponent({
                     <div className="flex flex-col justify-between items-center p-2 border-2 border-gray-400 border-dashed rounded text-center">
                         <img
                             crossOrigin="anonymous"
-                            className="min-h-52 w-auto cursor-pointer"
+                            className="h-48 w-80 cursor-pointer"
                             src={userPhoto}
                         />
 
