@@ -67,15 +67,13 @@ export default function Header({ toggleSidebar }) {
                                     name@flowbite.com
                                 </span>
                             </Dropdown.Header>
-                            <Dropdown.Item className="p-2 hover:shadow dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-300">
+                            <Dropdown.Item className="p-2 shadow-[rgba(0,0,15,0.5)_2px_2px_4px_0px] hover:shadow dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-300">
                                 Dashboard
                             </Dropdown.Item>
-                            <Dropdown.Item className="p-2 hover:shadow dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-300">
+                            <Dropdown.Item className="p-2 shadow-[rgba(0,0,15,0.5)_2px_2px_4px_0px] hover:shadow dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-300">
                                 Settings
                             </Dropdown.Item>
-
-                            <Dropdown.Divider />
-                            <Dropdown.Item className="p-2 hover:shadow dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-300">
+                            <Dropdown.Item className="p-2 shadow-[rgba(0,0,15,0.5)_2px_2px_4px_0px] hover:shadow dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-300">
                                 Sign out
                             </Dropdown.Item>
                         </Dropdown>

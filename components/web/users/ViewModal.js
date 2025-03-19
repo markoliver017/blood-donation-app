@@ -20,7 +20,6 @@ import { CircleX, Save, UserPlus } from 'lucide-react';
 import { IconPickerItem } from 'react-icons-picker';
 import Select from 'react-select';
 import { updateUser, updateUserPhoto } from '@/api/users/usersQuery';
-import { getAllRoles } from '@/api/roles/rolesQuery';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaExclamationCircle } from 'react-icons/fa';
 import clsx from 'clsx';
@@ -116,17 +115,6 @@ const ViewModal = ({
         console.log('selectedOptions role', selectedState);
         console.log('isValidUrlisValidUrlisValidUrl', isValidUrl);
     }, [data, user, errors, selectedState]);
-
-    const handleReset = () => {
-        setData(initialData);
-        setErrors({});
-        setProcessing(false);
-        setFiles([]);
-        dispatchSelectedState({
-            type: 'reset',
-            selected: null,
-        });
-    };
 
     const handleSelectedOptions = (type, selected) => {
         setData((prev) => ({
@@ -372,7 +360,7 @@ const ViewModal = ({
                                                         )}
                                                 </>
                                             )}
-                                            <div className="flex justify-between px-4 py-2">
+                                            <div className="flex justify-center gap-3 px-4 py-2">
                                                 <Label>
                                                     <input
                                                         type="radio"
@@ -614,7 +602,8 @@ const ViewModal = ({
                                                                 <div className="flex items-center gap-3">
                                                                     <IconPickerItem
                                                                         value={
-                                                                            option.icon
+                                                                            option.icon ||
+                                                                            'FaUser'
                                                                         }
                                                                         size={
                                                                             24
@@ -729,7 +718,8 @@ const ViewModal = ({
                                                                 <div className="flex items-center gap-3">
                                                                     <IconPickerItem
                                                                         value={
-                                                                            option.icon
+                                                                            option.icon ||
+                                                                            'FaUser'
                                                                         }
                                                                         size={
                                                                             24

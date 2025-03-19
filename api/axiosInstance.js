@@ -4,7 +4,7 @@ import axios from 'axios';
 const API_TOKEN =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0dXNlckBlbWFpbC5jb20iLCJpYXQiOjE3NDEzMTkzNDV9.v4MpFMXNq7L7USZm8ZGrxKLEEDXbVV_uSf-ldkJRmUM';
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:5000/api', // Replace with your API base URL
+    baseURL: 'http://localhost:5000/api',
 });
 
 axiosInstance.interceptors.request.use(

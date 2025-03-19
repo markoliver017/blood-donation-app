@@ -150,7 +150,7 @@ export default function PhotoUploadComponent({
                     <input {...getInputProps()} />
                     <img
                         alt="Photo"
-                        className="h-48 w-80 text-4xl md:text-7xl xs:text-base font-bold flex items-center justify-center"
+                        className="h-48 w-80 text-4xl md:text-5xl xs:text-base font-bold flex items-center justify-center"
                     />
                     <p>
                         Drag 'n' drop some files here, or click to select files

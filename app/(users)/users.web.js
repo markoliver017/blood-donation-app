@@ -9,11 +9,11 @@ import { DataTable } from '@components/web/users/DataTable';
 import { columns } from '@components/web/users/UserColumns';
 import clsx from 'clsx';
 
-import { CirclePlus, Delete, EyeIcon, UserCog, UserIcon } from 'lucide-react';
+import { CirclePlus, Delete, EyeIcon, UserIcon } from 'lucide-react';
 
 import SweetAlert from '@/components/web/helper/SweetAlert';
-import { toast } from 'react-toastify';
 import useRoleStore from '@/store/useRoleStore';
+import { lucideReactIcons } from '@/components/web/reusable_components/PreloadedIcons';
 
 const App = () => {
     const { roles, fetchRoles } = useRoleStore();
@@ -44,7 +44,7 @@ const App = () => {
             roles.map((role) => ({
                 label: role.role_name,
                 value: role.role_name,
-                icon: UserCog,
+                icon: lucideReactIcons[role.icon] || UserIcon,
                 id: role.id,
             })),
         );
@@ -56,7 +56,6 @@ const App = () => {
             const usersData = await getAllUsers();
             setUsers(usersData);
             setProcessing(false);
-
         } catch (error) {
             if (error.name === 'AxiosError') {
                 SweetAlert({
@@ -79,9 +78,7 @@ const App = () => {
                     confirmButtonText: 'OK',
                 });
             }
-        }
-        finally {
-
+        } finally {
         }
     };
 

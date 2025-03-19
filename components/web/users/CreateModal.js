@@ -11,7 +11,7 @@ import {
 import Modal from 'react-native-modal';
 import PhotoUploadComponent from '@components/web/reusable_components/PhotoUploadComponent';
 import PhotoLinkComponent from '@components/web/reusable_components/PhotoLinkComponent';
-import { Avatar, Label } from 'flowbite-react';
+import { Label } from 'flowbite-react';
 import { getSingleStyle } from '@components/web/custom/select-styles';
 import { CircleX, UserPlus } from 'lucide-react';
 import { IconPickerItem } from 'react-icons-picker';
@@ -259,7 +259,7 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
                                             )}
 
                                             {/* Radio buttons */}
-                                            <div className="flex justify-between px-4 py-2">
+                                            <div className="flex justify-center gap-3 px-4 py-2">
                                                 <Label>
                                                     <input
                                                         type="radio"
