@@ -44,7 +44,7 @@ const App = () => {
             roles.map((role) => ({
                 label: role.role_name,
                 value: role.role_name,
-                icon: lucideReactIcons[role.icon] || UserIcon,
+                icon: role.icon || "UserIcon",
                 id: role.id,
             })),
         );
@@ -139,6 +139,7 @@ const App = () => {
             }
         }
     };
+
     return (
         <div
             id="users_container"

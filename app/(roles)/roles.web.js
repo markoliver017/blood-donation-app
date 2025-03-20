@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import RolesCreateModal from '@/components/web/roles/RolesCreateModal';
 import SweetAlert from '@/components/web/helper/SweetAlert';
 import RolesViewModal from '@/components/web/roles/RolesViewModal';
+import { deleteRole } from '@/api/roles/rolesQuery';
 
 export default function Page() {
     const { roles, fetchRoles } = useRoleStore();
@@ -46,6 +47,54 @@ export default function Page() {
             text: data.message,
         });
         fetchRoles(setProcessing);
+    };
+
+    const handleRoleDeletion = (role_id) => {
+        SweetAlert({
+            title: 'Role Deletion?',
+            text: 'Are you sure you want to delete this role?',
+            showCancelButton: true,
+            onConfirm: () => processDeleteRole(role_id),
+        });
+    };
+
+    const processDeleteRole = async (role_id) => {
+        try {
+            const response = await deleteRole(role_id);
+            if (!response.error) {
+                SweetAlert({
+                    title: 'Role Deletion',
+                    text: response.msg,
+                    icon: 'success',
+                    confirmButtonText: 'Okay',
+                });
+                fetchRoles();
+            }
+        } catch (error) {
+            if (error.name === 'AxiosError') {
+                SweetAlert({
+                    title: 'Role Deletion',
+                    text:
+                        error.message + ' - Please contact your administrator.',
+                    icon: 'error',
+                    confirmButtonText: 'Okay',
+                });
+            }
+
+            if (error.response) {
+                const errorResponse = error.response?.data?.error;
+                if (typeof errorResponse == 'string') {
+                    SweetAlert({
+                        title: 'Error',
+                        text:
+                            'There was an error while trying to delete the role: ' +
+                            errorResponse,
+                        icon: 'error',
+                        confirmButtonText: 'Okay',
+                    });
+                }
+            }
+        }
     };
 
     const handleClosingModal = () => {
@@ -93,7 +142,7 @@ export default function Page() {
                     </p>
                     <button
                         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                        // onClick={() => setCreateModalVisible(true)}
+                    // onClick={() => setCreateModalVisible(true)}
                     >
                         Add a Role
                     </button>
@@ -144,9 +193,9 @@ export default function Page() {
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             className="p-2 hover:shadow text-gray-700 hover:text-red-600 dark:text-slate-200 dark:hover:text-red-600"
-                                            // onClick={() =>
-                                            //     handleUserDeletion(userData.id)
-                                            // }
+                                            onClick={() =>
+                                                handleRoleDeletion(role.id)
+                                            }
                                         >
                                             <Delete className="inline-block mr-2" />{' '}
                                             Delete

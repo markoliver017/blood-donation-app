@@ -43,3 +43,20 @@ export const updateRole = async (role_id, data) => {
         throw error;
     }
 };
+
+export const deleteRole = async (role_id) => {
+    try {
+        const response = await axiosInstance({
+            method: 'delete',
+            url: `/roles/${role_id}`,
+        });
+        console.log('handleRoleDeletion success', response);
+        return {
+            error: false,
+            msg: 'Role has been successfully deleted!',
+            data: response.data,
+        };
+    } catch (error) {
+        throw error;
+    }
+};

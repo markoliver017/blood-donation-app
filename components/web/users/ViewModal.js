@@ -333,7 +333,7 @@ const ViewModal = ({
                                                     {userPhoto &&
                                                         isValidUrl.status &&
                                                         userPhoto !=
-                                                            user.File?.url && (
+                                                        user.File?.url && (
                                                             <div className="mt-2">
                                                                 <button
                                                                     className="button bg-orange-600 w-full"
@@ -608,7 +608,7 @@ const ViewModal = ({
                                                                         size={
                                                                             24
                                                                         }
-                                                                        color="#000"
+                                                                        color={mode == "light" ? "#000" : "#fff"}
                                                                     />
                                                                     <span>
                                                                         {
@@ -724,7 +724,7 @@ const ViewModal = ({
                                                                         size={
                                                                             24
                                                                         }
-                                                                        color="#000"
+                                                                        color={mode == "light" ? "#000" : "#fff"}
                                                                     />
                                                                     <span>
                                                                         {
@@ -799,7 +799,7 @@ const ViewModal = ({
                                                         }}
                                                         className={clsx(
                                                             !data.isChangePassword &&
-                                                                'pointer-events-none',
+                                                            'pointer-events-none',
                                                         )}
                                                     >
                                                         <div>
