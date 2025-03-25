@@ -11,6 +11,7 @@ import {
     CircleChevronRight,
     Droplet,
     ListPlus,
+    Menu,
     Settings,
     SquareUser,
     UserRoundCog,
@@ -89,7 +90,7 @@ export default function Sidebar({
                                     isCollapsed={isCollapsed}
                                     path="/"
                                     Icon={<FaHome />}
-                                    name="Home"
+                                    name="Dashboard"
                                 />
                             </li>
                             <li>
@@ -101,14 +102,6 @@ export default function Sidebar({
                                 />
                             </li>
 
-                            <li>
-                                <SideNavList
-                                    isCollapsed={isCollapsed}
-                                    path="#"
-                                    Icon={<Settings />}
-                                    name="Settings"
-                                />
-                            </li>
                             <li>
                                 <div
                                     className={clsx(
@@ -161,6 +154,14 @@ export default function Sidebar({
                                             path="/roles"
                                             Icon={<UserRoundCog />}
                                             name="Roles Management"
+                                        />
+                                    </li>
+                                    <li className="mt-2">
+                                        <SideNavList
+                                            isCollapsed={isCollapsed}
+                                            path="/menu"
+                                            Icon={<Menu />}
+                                            name="Menu Management"
                                         />
                                     </li>
                                 </ul>

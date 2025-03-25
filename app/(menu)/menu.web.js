@@ -1,27 +1,31 @@
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
-import { CirclePlus, Delete, EyeIcon, UserIcon } from 'lucide-react';
-import { DataTable } from '@/components/web/roles/DataTable';
-import { columns } from '@components/web/roles/RoleColumns';
-import DataTableColumnHeader from '@components/web/reusable_components/DataTableColumnHeader';
-import { Dropdown } from 'flowbite-react';
-import useRoleStore from '@/store/useRoleStore';
+import {
+    CirclePlus,
+    Delete,
+    EyeIcon,
+    PanelTopOpen,
+    UserIcon,
+} from 'lucide-react';
 import { toast } from 'react-toastify';
-import RolesCreateModal from '@/components/web/roles/RolesCreateModal';
 import SweetAlert from '@/components/web/helper/SweetAlert';
-import RolesViewModal from '@/components/web/roles/RolesViewModal';
+import { IconPickerItem } from 'react-icons-picker';
+import MenusCreateModal from '@/components/web/menus/MenusCreateModal';
+import useMenuStore from '@/store/useMenuStore';
+import MenusViewModal from '@/components/web/menus/MenusViewModal';
+import { Dropdown } from 'flowbite-react';
 
 export default function Page() {
-    const { roles, fetchRoles } = useRoleStore();
+    const { menus, fetchMenus } = useMenuStore();
     const [processing, setProcessing] = useState(false);
     const [openCreateModal, setOpenCreateModal] = useState(false);
     const [openViewModal, setOpenViewModal] = useState(false);
-    const [roleOnViewData, setRoleOnViewData] = useState(null);
+    const [menuOnViewData, setMenuOnViewData] = useState(null);
 
     useEffect(() => {
-        if (!roles.length) {
-            fetchRoles(setProcessing).catch((error) => {
-                toast.error('Failed to fetch roles: ' + error.message, {
+        if (!menus.length) {
+            fetchMenus(setProcessing).catch((error) => {
+                toast.error('Failed to fetch menus: ' + error.message, {
                     position: 'bottom-right',
                     autoClose: 5000,
                 });
@@ -29,23 +33,23 @@ export default function Page() {
         }
     }, []);
 
-    const handleOpenModalView = (role) => {
-        setRoleOnViewData(role);
+    const handleOpenModalView = (menu) => {
+        setMenuOnViewData(menu);
         setOpenViewModal(true);
     };
     const handleCloseModalView = () => {
-        setRoleOnViewData(null);
+        setMenuOnViewData(null);
         setOpenViewModal(false);
     };
 
     const handleUpdate = (data) => {
         SweetAlert({
-            element_id: 'roles_container',
+            element_id: 'menus_container',
             title: data.title || 'Notification',
             icon: data.status,
             text: data.message,
         });
-        fetchRoles(setProcessing);
+        fetchMenus(setProcessing);
     };
 
     const handleClosingModal = () => {
@@ -54,28 +58,28 @@ export default function Page() {
 
     return (
         <div
-            id="roles_container"
+            id="menus_container"
             className={clsx(
                 processing ? 'animate-pulse' : 'animate-none',
                 'p-6 space-y-4',
             )}
         >
-            <RolesCreateModal
+            <MenusCreateModal
                 isOpen={openCreateModal}
                 onClose={handleClosingModal}
                 onSave={handleUpdate}
             />
-            {roleOnViewData && (
-                <RolesViewModal
+            {menuOnViewData && (
+                <MenusViewModal
                     isOpen={openViewModal}
                     onClose={handleCloseModalView}
                     onUpdate={handleUpdate}
-                    role={roleOnViewData}
+                    role={menuOnViewData}
                 />
             )}
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold dark:text-white">
-                    Roles Management ( <small>{roles.length}</small> )
+                    Menu Management ( <small>{menus.length}</small> )
                 </h2>
                 <button
                     className="px-4 py-2 bg-green-800 text-white rounded-md hover:bg-green-900 transition"
@@ -85,36 +89,37 @@ export default function Page() {
                 </button>
             </div>
 
-            {roles.length === 0 ? (
+            {menus.length === 0 ? (
                 <div className="flex flex-col items-center justify-center space-y-4 p-10 border rounded-md shadow-lg dark:bg-gray-800">
-                    <UserIcon className="w-16 h-16 text-gray-400" />
+                    <PanelTopOpen className="w-16 h-16 text-gray-400" />
                     <p className="text-gray-500 dark:text-gray-300">
-                        No roles found.
+                        No menus found.
                     </p>
                     <button
                         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                        // onClick={() => setCreateModalVisible(true)}
+                        onClick={() => setOpenCreateModal(true)}
                     >
-                        Add a Role
+                        Add a Menu
                     </button>
                 </div>
             ) : (
-                <DataTable
-                    className="shadow-md rounded-md overflow-hidden bg-white dark:bg-gray-800"
-                    data={roles}
-                    columns={[
-                        ...columns,
-                        {
-                            id: 'actions',
-                            header: ({ column }) => (
-                                <DataTableColumnHeader
-                                    column={column}
-                                    title="Action"
-                                />
-                            ),
-                            cell: ({ row }) => {
-                                const role = row.original;
-                                return (
+                <div className="container mx-auto p-4">
+                    {/* Page Content */}
+                    <div className="flex flex-col gap-2">
+                        {/* Menu Card */}
+                        {menus.map((menu, index) => (
+                            <div
+                                key={index}
+                                className="bg-white rounded-lg shadow-lg p-6 hover:scale-105"
+                            >
+                                <div className="flex justify-between">
+                                    <h3 className="flex-items-center text-xl font-semibold text-gray-800 mb-3">
+                                        <IconPickerItem
+                                            value={menu.icon}
+                                            size={24}
+                                        />
+                                        {menu.name}
+                                    </h3>
                                     <Dropdown
                                         label={
                                             <span className="button bg-gray-200 text-black">
@@ -130,13 +135,13 @@ export default function Page() {
                                                 Available Actions
                                             </p>
                                             <p className="text-sm font-bold">
-                                                Role: {role.role_name}
+                                                Menu: {menu.name}
                                             </p>
                                         </Dropdown.Header>
                                         <Dropdown.Item
                                             className="p-2 hover:shadow text-gray-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400"
                                             onClick={() =>
-                                                handleOpenModalView(role)
+                                                handleOpenModalView(menu)
                                             }
                                         >
                                             <EyeIcon className="inline-block mr-2" />{' '}
@@ -145,18 +150,30 @@ export default function Page() {
                                         <Dropdown.Item
                                             className="p-2 hover:shadow text-gray-700 hover:text-red-600 dark:text-slate-200 dark:hover:text-red-600"
                                             // onClick={() =>
-                                            //     handleUserDeletion(userData.id)
+                                            //     handleRoleDeletion(menu.id)
                                             // }
                                         >
                                             <Delete className="inline-block mr-2" />{' '}
                                             Delete
                                         </Dropdown.Item>
                                     </Dropdown>
-                                );
-                            },
-                        },
-                    ]}
-                />
+                                </div>
+                                <ul className="space-y-2">
+                                    {['Sub-Menu', 'Sub-Menu', 'Sub-Menu'].map(
+                                        (submenu, idx) => (
+                                            <li
+                                                key={idx}
+                                                className="text-gray-600 hover:text-blue-500 transition-colors cursor-pointer"
+                                            >
+                                                {submenu}
+                                            </li>
+                                        ),
+                                    )}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             )}
         </div>
     );
