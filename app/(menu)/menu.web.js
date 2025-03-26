@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import {
     CirclePlus,
     Delete,
@@ -73,8 +74,8 @@ export default function Page() {
                 <MenusViewModal
                     isOpen={openViewModal}
                     onClose={handleCloseModalView}
-                    onUpdate={handleUpdate}
-                    role={menuOnViewData}
+                    onSave={handleUpdate}
+                    menu={menuOnViewData}
                 />
             )}
             <div className="flex justify-between items-center">
@@ -108,9 +109,11 @@ export default function Page() {
                     <div className="flex flex-col gap-2">
                         {/* Menu Card */}
                         {menus.map((menu, index) => (
-                            <div
+                            <motion.div
                                 key={index}
-                                className="bg-white rounded-lg shadow-lg p-6 hover:scale-105"
+                                className="bg-white rounded-lg shadow-lg p-6 "
+                                whileHover={{ scale: 1.03 }} // This adds the hover effect
+                                transition={{ duration: 0.5 }} // Smooth transition
                             >
                                 <div className="flex justify-between">
                                     <h3 className="flex-items-center text-xl font-semibold text-gray-800 mb-3">
@@ -170,7 +173,7 @@ export default function Page() {
                                         ),
                                     )}
                                 </ul>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
                 </div>

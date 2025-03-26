@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { Image } from 'react-native';
 import { motion } from 'framer-motion';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Appearance, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 import { FaHome } from 'react-icons/fa';
 import {
     CircleChevronDown,
@@ -91,6 +91,7 @@ export default function Sidebar({
                                     path="/"
                                     Icon={<FaHome />}
                                     name="Dashboard"
+                                    className="text-xl"
                                 />
                             </li>
                             <li>
@@ -99,6 +100,7 @@ export default function Sidebar({
                                     path="/profile"
                                     Icon={<SquareUser />}
                                     name="Profile"
+                                    className="text-xl"
                                 />
                             </li>
 
@@ -146,6 +148,7 @@ export default function Sidebar({
                                             path="/users"
                                             Icon={<Users />}
                                             name="Users Management"
+                                            className="text-sm"
                                         />
                                     </li>
                                     <li className="mt-2">

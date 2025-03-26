@@ -20,7 +20,7 @@ import { CircleX, ListPlus } from 'lucide-react';
 import { FaExclamationCircle } from 'react-icons/fa';
 import { reactIconsFa } from '@components/web/reusable_components/PreloadedIcons';
 import { handleError } from '@components/web/helper/functions';
-import { storeMenu } from '@/api/menu/menusQuery';
+import { updateMenu } from '@/api/menu/menusQuery';
 
 const updateSelectOptions = (state, action) => {
     const { type, selected } = action;
@@ -85,16 +85,17 @@ export default function MenusViewModal({ isOpen, onClose, onSave, menu }) {
 
     const saveMenu = async (data) => {
         try {
-            const response = await storeMenu(data);
+            const response = await updateMenu(menu.id, data);
             if (!response.error) {
                 onClose();
                 onSave({
-                    title: 'Add New Menu',
+                    title: 'Update Menu',
                     status: 'success',
                     message: response.msg,
                 });
             }
         } catch (error) {
+            console.log(error);
             handleError(error, setErrors);
         } finally {
             setProcessing(false);
@@ -106,8 +107,8 @@ export default function MenusViewModal({ isOpen, onClose, onSave, menu }) {
         e.preventDefault();
 
         SweetAlert({
-            title: 'New Menu',
-            text: 'Are you sure you want to add this menu?',
+            title: 'Update Menu',
+            text: 'Are you sure you want to update this menu?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes',
@@ -254,7 +255,7 @@ export default function MenusViewModal({ isOpen, onClose, onSave, menu }) {
                                         <input
                                             type="number"
                                             min={0}
-                                            name="link"
+                                            name="ctr"
                                             value={data.ctr}
                                             placeholder="0"
                                             onChange={handleInputChange}
@@ -330,7 +331,7 @@ export default function MenusViewModal({ isOpen, onClose, onSave, menu }) {
                             ) : (
                                 <ListPlus className="h-4 w-4" />
                             )}
-                            <span>Add</span>
+                            <span>Update</span>
                         </button>
                     </div>
                 </View>

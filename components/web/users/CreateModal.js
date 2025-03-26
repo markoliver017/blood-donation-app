@@ -41,7 +41,6 @@ const initialData = {
     middle_name: '',
     prefix: '',
     suffix: '',
-    contact_number: '',
     gender: '',
     email: '',
     password: '',
@@ -444,37 +443,6 @@ const Create = ({ isOpen, onClose, onSave, roleOptions }) => {
                                                                     <FaExclamationCircle className="h-3 w-3" />{' '}
                                                                     {
                                                                         errors.suffix
-                                                                    }
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
-                                                        <Label>
-                                                            Contact #:
-                                                            <small className="optional">
-                                                                (optional)
-                                                            </small>
-                                                        </Label>
-                                                        <input
-                                                            type="text"
-                                                            name="contact_number"
-                                                            value={
-                                                                data.contact_number
-                                                            }
-                                                            onChange={
-                                                                handleInputChange
-                                                            }
-                                                            placeholder="+639XXXXXXXXX or 09XXXXXXXXX"
-                                                            className="input"
-                                                        />
-                                                        <div className="error">
-                                                            {errors.contact_number && (
-                                                                <span className="flex-items-center">
-                                                                    <FaExclamationCircle className="h-3 w-3" />{' '}
-                                                                    {
-                                                                        errors.contact_number
                                                                     }
                                                                 </span>
                                                             )}

@@ -79,7 +79,6 @@ const ViewModal = ({
         middle_name: user?.middle_name || '',
         prefix: user?.prefix || '',
         suffix: user?.suffix || '',
-        contact_number: user?.contact_number || '',
         gender: user?.gender || '',
         email: user?.email || '',
         role_id: user?.Role?.id || '',
@@ -333,7 +332,7 @@ const ViewModal = ({
                                                     {userPhoto &&
                                                         isValidUrl.status &&
                                                         userPhoto !=
-                                                        user.File?.url && (
+                                                            user.File?.url && (
                                                             <div className="mt-2">
                                                                 <button
                                                                     className="button bg-orange-600 w-full"
@@ -553,37 +552,6 @@ const ViewModal = ({
                                                     </div>
 
                                                     <div>
-                                                        <Label>
-                                                            Contact #:
-                                                            <small className="optional">
-                                                                (optional)
-                                                            </small>
-                                                        </Label>
-                                                        <input
-                                                            type="text"
-                                                            name="contact_number"
-                                                            value={
-                                                                data.contact_number
-                                                            }
-                                                            onChange={
-                                                                handleInputChange
-                                                            }
-                                                            placeholder="+639XXXXXXXXX or 09XXXXXXXXX"
-                                                            className="input"
-                                                        />
-                                                        <div className="error">
-                                                            {errors.contact_number && (
-                                                                <span className="flex-items-center">
-                                                                    <FaExclamationCircle className="h-3 w-3" />{' '}
-                                                                    {
-                                                                        errors.contact_number
-                                                                    }
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
                                                         <Label>Gender:</Label>
 
                                                         <Select
@@ -608,7 +576,12 @@ const ViewModal = ({
                                                                         size={
                                                                             24
                                                                         }
-                                                                        color={mode == "light" ? "#000" : "#fff"}
+                                                                        color={
+                                                                            mode ==
+                                                                            'light'
+                                                                                ? '#000'
+                                                                                : '#fff'
+                                                                        }
                                                                     />
                                                                     <span>
                                                                         {
@@ -724,7 +697,12 @@ const ViewModal = ({
                                                                         size={
                                                                             24
                                                                         }
-                                                                        color={mode == "light" ? "#000" : "#fff"}
+                                                                        color={
+                                                                            mode ==
+                                                                            'light'
+                                                                                ? '#000'
+                                                                                : '#fff'
+                                                                        }
                                                                     />
                                                                     <span>
                                                                         {
@@ -799,7 +777,7 @@ const ViewModal = ({
                                                         }}
                                                         className={clsx(
                                                             !data.isChangePassword &&
-                                                            'pointer-events-none',
+                                                                'pointer-events-none',
                                                         )}
                                                     >
                                                         <div>
