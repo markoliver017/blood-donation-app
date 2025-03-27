@@ -1,20 +1,14 @@
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import {
-    CirclePlus,
-    Delete,
-    EyeIcon,
-    PanelTopOpen,
-    UserIcon,
-} from 'lucide-react';
+
 import { toast } from 'react-toastify';
 import SweetAlert from '@/components/web/helper/SweetAlert';
-import { IconPickerItem } from 'react-icons-picker';
 import MenusCreateModal from '@/components/web/menus/MenusCreateModal';
 import useMenuStore from '@/store/useMenuStore';
 import MenusViewModal from '@/components/web/menus/MenusViewModal';
-import { Dropdown } from 'flowbite-react';
+import { deleteMenu } from '@/api/menu/menusQuery';
+import MenuCard from '@/components/web/menus/MenuCard';
+import { CirclePlus, PanelTopOpen } from 'lucide-react';
 
 export default function Page() {
     const { menus, fetchMenus } = useMenuStore();
@@ -24,14 +18,12 @@ export default function Page() {
     const [menuOnViewData, setMenuOnViewData] = useState(null);
 
     useEffect(() => {
-        if (!menus.length) {
-            fetchMenus(setProcessing).catch((error) => {
-                toast.error('Failed to fetch menus: ' + error.message, {
-                    position: 'bottom-right',
-                    autoClose: 5000,
-                });
+        fetchMenus(setProcessing).catch((error) => {
+            toast.error('Failed to fetch menus: ' + error.message, {
+                position: 'bottom-right',
+                autoClose: 5000,
             });
-        }
+        });
     }, []);
 
     const handleOpenModalView = (menu) => {
@@ -51,6 +43,54 @@ export default function Page() {
             text: data.message,
         });
         fetchMenus(setProcessing);
+    };
+
+    const handleMenuDeletion = (menu_id) => {
+        SweetAlert({
+            title: 'Menu Deletion?',
+            text: 'Are you sure you want to delete this menu?',
+            showCancelButton: true,
+            onConfirm: () => processDeleteMenu(menu_id),
+        });
+    };
+
+    const processDeleteMenu = async (menu_id) => {
+        try {
+            const response = await deleteMenu(menu_id);
+            if (!response.error) {
+                SweetAlert({
+                    title: 'Menu Deletion',
+                    text: response.msg,
+                    icon: 'success',
+                    confirmButtonText: 'Okay',
+                });
+                fetchMenus();
+            }
+        } catch (error) {
+            if (error.name === 'AxiosError') {
+                SweetAlert({
+                    title: 'Menu Deletion',
+                    text:
+                        error.message + ' - Please contact your administrator.',
+                    icon: 'error',
+                    confirmButtonText: 'Okay',
+                });
+            }
+
+            if (error.response) {
+                const errorResponse = error.response?.data?.error;
+                if (typeof errorResponse == 'string') {
+                    SweetAlert({
+                        title: 'Error',
+                        text:
+                            'There was an error while trying to delete the menu: ' +
+                            errorResponse,
+                        icon: 'error',
+                        confirmButtonText: 'Okay',
+                    });
+                }
+            }
+        }
     };
 
     const handleClosingModal = () => {
@@ -109,71 +149,14 @@ export default function Page() {
                     <div className="flex flex-col gap-2">
                         {/* Menu Card */}
                         {menus.map((menu, index) => (
-                            <motion.div
+                            <MenuCard
                                 key={index}
-                                className="bg-white rounded-lg shadow-lg p-6 "
-                                whileHover={{ scale: 1.03 }} // This adds the hover effect
-                                transition={{ duration: 0.5 }} // Smooth transition
-                            >
-                                <div className="flex justify-between">
-                                    <h3 className="flex-items-center text-xl font-semibold text-gray-800 mb-3">
-                                        <IconPickerItem
-                                            value={menu.icon}
-                                            size={24}
-                                        />
-                                        {menu.name}
-                                    </h3>
-                                    <Dropdown
-                                        label={
-                                            <span className="button bg-gray-200 text-black">
-                                                &#8942;
-                                            </span>
-                                        }
-                                        className="bg-white dark:text-white"
-                                        arrowIcon={false}
-                                        inline
-                                    >
-                                        <Dropdown.Header className="dark:text-slate-200 border-b">
-                                            <p className="text-xs">
-                                                Available Actions
-                                            </p>
-                                            <p className="text-sm font-bold">
-                                                Menu: {menu.name}
-                                            </p>
-                                        </Dropdown.Header>
-                                        <Dropdown.Item
-                                            className="p-2 hover:shadow text-gray-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400"
-                                            onClick={() =>
-                                                handleOpenModalView(menu)
-                                            }
-                                        >
-                                            <EyeIcon className="inline-block mr-2" />{' '}
-                                            View
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            className="p-2 hover:shadow text-gray-700 hover:text-red-600 dark:text-slate-200 dark:hover:text-red-600"
-                                            // onClick={() =>
-                                            //     handleRoleDeletion(menu.id)
-                                            // }
-                                        >
-                                            <Delete className="inline-block mr-2" />{' '}
-                                            Delete
-                                        </Dropdown.Item>
-                                    </Dropdown>
-                                </div>
-                                <ul className="space-y-2">
-                                    {['Sub-Menu', 'Sub-Menu', 'Sub-Menu'].map(
-                                        (submenu, idx) => (
-                                            <li
-                                                key={idx}
-                                                className="text-gray-600 hover:text-blue-500 transition-colors cursor-pointer"
-                                            >
-                                                {submenu}
-                                            </li>
-                                        ),
-                                    )}
-                                </ul>
-                            </motion.div>
+                                menu={menu}
+                                onView={handleOpenModalView}
+                                onDelete={handleMenuDeletion}
+                                fetchMenus={fetchMenus}
+                                setProcessing={setProcessing}
+                            />
                         ))}
                     </div>
                 </div>

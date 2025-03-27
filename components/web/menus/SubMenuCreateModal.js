@@ -16,11 +16,12 @@ import Modal from 'react-native-modal';
 import { Label } from 'flowbite-react';
 import { ToastContainer } from 'react-toastify';
 import SweetAlert from '@components/web/helper/SweetAlert';
-import { CircleX, ListPlus } from 'lucide-react';
+import { CircleX, ListPlus, UserPlus } from 'lucide-react';
 import { FaExclamationCircle } from 'react-icons/fa';
 import { reactIconsFa } from '@components/web/reusable_components/PreloadedIcons';
 import { handleError } from '@components/web/helper/functions';
-import { updateMenu } from '@/api/menu/menusQuery';
+import { storeMenu } from '@/api/menu/menusQuery';
+import { storeSubMenu } from '@/api/menu/submenuQuery';
 
 const updateSelectOptions = (state, action) => {
     const { type, selected } = action;
@@ -34,52 +35,57 @@ const updateSelectOptions = (state, action) => {
 
     return { ...state, [type]: selected };
 };
-
+const initialData = {
+    name: '',
+    icon: '',
+    link: '',
+    ctr: 0,
+    has_child: '',
+};
 const iconOptions = Object.keys(reactIconsFa).map((icon) => ({
     label: icon,
     value: icon,
     icon: icon,
 }));
 
-const hasChildOptions = [
-    { label: 'Yes', value: true },
-    { label: 'No', value: false },
-];
-
-export default function MenusViewModal({ isOpen, onClose, onSave, menu }) {
+export default function SubMenuCreateModal({ isOpen, onClose, menu, onSave }) {
     const mode = useColorScheme();
     const [errors, setErrors] = useState({});
     const [processing, setProcessing] = useState(false);
-    const [data, setData] = useImmer({
-        name: menu.name,
-        icon: menu.icon,
-        link: menu.link,
-        ctr: menu.ctr,
-        has_child: menu.has_child,
-    });
+    const [data, setData] = useImmer(initialData);
     const [selectedState, dispatchSelectedState] = useReducer(
         updateSelectOptions,
-        {
-            icon: iconOptions.find((icon) => icon.value == menu.icon),
-            has_child: hasChildOptions.find(
-                (opt) => opt.value == menu.has_child,
-            ),
-        },
+        {},
     );
 
-    const saveMenu = async (data) => {
+    const handleReset = () => {
+        setData(initialData);
+        setErrors({});
+        setProcessing(false);
+        dispatchSelectedState({
+            type: 'reset',
+            selected: null,
+        });
+    };
+
+    useEffect(() => {
+        if (isOpen) {
+            handleReset();
+        }
+    }, [isOpen]);
+
+    const saveSubmenu = async (data) => {
         try {
-            const response = await updateMenu(menu.id, data);
+            const response = await storeSubMenu(menu.id, data);
             if (!response.error) {
                 onClose();
                 onSave({
-                    title: 'Update Menu',
+                    title: 'Add New Sub-Menu',
                     status: 'success',
                     message: response.msg,
                 });
             }
         } catch (error) {
-            console.log(error);
             handleError(error, setErrors);
         } finally {
             setProcessing(false);
@@ -91,20 +97,20 @@ export default function MenusViewModal({ isOpen, onClose, onSave, menu }) {
         e.preventDefault();
 
         SweetAlert({
-            title: 'Update Menu',
-            text: 'Are you sure you want to update this menu?',
+            title: 'New Sub Menu',
+            text: 'Are you sure you want to add this sub-menu?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes',
             cancelButtonText: 'Cancel',
-            onConfirm: () => saveMenu(data), //useState data
+            onConfirm: () => saveSubmenu(data), //useState data
             onCancel: () => setProcessing(false),
         });
     };
 
     const handleSelectedOptions = (type, selected) => {
         setData((draft) => {
-            draft[type] = selected?.value || '';
+            draft[type] = selected?.value;
         });
         dispatchSelectedState({
             type: type,
@@ -149,7 +155,7 @@ export default function MenusViewModal({ isOpen, onClose, onSave, menu }) {
                         <div className="flex-1 w-full margin-auto items-center space-y-3 p-5 shadow-md rounded bg-gray-200 dark:bg-slate-700">
                             <form className="space-y-3 ">
                                 <span className="divider divider-start text-lg underline pb-5 dark:text-blue-500">
-                                    Add New Menu
+                                    {menu.name} - Sub Menu
                                 </span>
                                 <div>
                                     <div>
@@ -185,7 +191,10 @@ export default function MenusViewModal({ isOpen, onClose, onSave, menu }) {
                                             classNamePrefix="select"
                                             placeholder="Has child? * (required)"
                                             closeMenuOnSelect={true}
-                                            options={hasChildOptions}
+                                            options={[
+                                                { label: 'Yes', value: 1 },
+                                                { label: 'No', value: 0 },
+                                            ]}
                                             onChange={(selectedValue) =>
                                                 handleSelectedOptions(
                                                     'has_child',
@@ -315,7 +324,7 @@ export default function MenusViewModal({ isOpen, onClose, onSave, menu }) {
                             ) : (
                                 <ListPlus className="h-4 w-4" />
                             )}
-                            <span>Update</span>
+                            <span>Add Sub Menu</span>
                         </button>
                     </div>
                 </View>

@@ -39,7 +39,7 @@ const initialData = {
     icon: '',
     link: '',
     ctr: 0,
-    has_child: 0,
+    has_child: '',
 };
 const iconOptions = Object.keys(reactIconsFa).map((icon) => ({
     label: icon,

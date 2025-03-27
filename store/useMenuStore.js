@@ -10,6 +10,7 @@ const useMenuStore = create(
             try {
                 if (callback) callback(true);
                 const response = await getAllMenus();
+                console.log('Refetch menus', response);
                 set({ menus: response });
             } catch (error) {
                 console.error('Error fetching menus:', error);
