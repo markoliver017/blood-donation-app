@@ -58,12 +58,12 @@ export default function MenuCard({
                 />
             )}
             <motion.div
-                className="bg-white rounded-lg shadow-lg p-6"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
                 whileHover={{ scale: 1.03 }}
                 transition={{ duration: 0.5 }}
             >
                 <div className="flex justify-between items-center">
-                    <h3 className="flex items-center text-xl font-semibold text-gray-800">
+                    <h3 className="flex items-center text-xl font-semibold text-gray-800 dark:text-gray-100 hover:text-blue-400 cursor-pointer">
                         <IconPickerItem
                             value={menu.icon}
                             size={24}
@@ -118,7 +118,7 @@ export default function MenuCard({
                                 className="flex justify-between items-center text-gray-600 hover:text-blue-500 cursor-pointer"
                             >
                                 <div
-                                    className="flex-items-center"
+                                    className="flex-items-center dark:text-gray-200 hover:text-blue-400"
                                     onClick={() => handleOpenModalView(submenu)}
                                 >
                                     <IconPickerItem value={submenu.icon} />

@@ -1,5 +1,5 @@
-import { Avatar, Dropdown } from 'flowbite-react';
-import { CircleUserIcon, Menu } from 'lucide-react';
+import { Dropdown } from 'flowbite-react';
+import { Menu } from 'lucide-react';
 
 export default function Header({ toggleSidebar }) {
     return (
